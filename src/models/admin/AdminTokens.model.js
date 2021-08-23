@@ -17,4 +17,5 @@ const adminToken = sequelize.define('admintokens', {
     timestamps: false
 })
 
+
 module.exports = adminToken

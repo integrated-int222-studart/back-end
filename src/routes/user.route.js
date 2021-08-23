@@ -53,7 +53,6 @@ router.post('/login', async(req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET)
-            // console.log({ token: token })
         const generateTokenID = await new userToken({
             userID: user.userID,
             token: token,
@@ -64,8 +63,15 @@ router.post('/login', async(req, res) => {
         res.status(400).send('Email or Password is wrong!')
     }
 })
-
 router.delete('/logout', authUser, async(req, res) => {
+    try {
+        await userToken.destroy({ where: { token: req.token }, force: true })
+        res.status(200).send('Logout!')
+    } catch (error) {
+        res.send(error)
+    }
+})
+router.delete('/logoutAll', authUser, async(req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
         res.status(200).send('Logout!')
@@ -74,7 +80,7 @@ router.delete('/logout', authUser, async(req, res) => {
     }
 })
 router.get('/profile', authUser, (req, res) => {
-    console.log(req.user)
+    // console.log(req.user)
     res.send({ user: req.user, token: req.token })
 })
 
