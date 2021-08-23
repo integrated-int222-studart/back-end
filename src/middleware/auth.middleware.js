@@ -12,8 +12,7 @@ const auth = async(req, res, next) => {
         if (!user) {
             throw new Error()
         }
-        const isMatchToken = await userTokens.findOne({ where: { userID: decode.userID } })
-            // const isMatchToken = await userTokens.findOne({ token })
+        const isMatchToken = await userTokens.findOne({ where: { token } })
         console.log("Token:")
         console.log(isMatchToken)
         if (!isMatchToken) {
