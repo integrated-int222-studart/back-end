@@ -54,7 +54,7 @@ router.post('/register', async(req, res) => {
 router.post('/login', async(req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
-        const token = jwt.sign({ id: user.userID }, process.env.JWT_SECRET)
+        const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET)
             // console.log({ token: token })
         const generateTokenID = await new userToken({
             userID: user.userID,
@@ -79,6 +79,7 @@ router.post('/logout', auth, async(req, res) => {
     }
 })
 router.get('/profile', auth, (req, res) => {
+    console.log(req.user)
     res.send({ user: req.user, token: req.token })
 })
 

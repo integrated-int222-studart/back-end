@@ -5,13 +5,15 @@ require('dotenv').config()
 const auth = async(req, res, next) => {
     try {
         const token = await req.header('Authorization').replace('Bearer ', '')
-        const isMatchToken = await userTokens.findOne({ token })
-        if (!isMatchToken) {
+        const decode = await jwt.verify(token, process.env.JWT_SECRET)
+        const user = await User.findOne({
+            where: { userID: decode.userID }
+        })
+        if (!user) {
             throw new Error()
         }
-        const decode = await jwt.verify(token, process.env.JWT_SECRET)
-        const user = await User.findOne({ id: decode.userID, 'usertokens.token': token })
-        if (!user) {
+        const isMatchToken = await userTokens.findOne({ token })
+        if (!isMatchToken) {
             throw new Error()
         }
         req.token = token
