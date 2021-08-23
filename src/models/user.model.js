@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize')
-const sequelize = require('../database/sequelize')
+const sequelize = require('../database/Sequelize')
 const bcrypt = require('bcryptjs')
 const tokenUser = require('./UserTokens.model')
 const User = sequelize.define('users', {
@@ -54,10 +54,11 @@ const User = sequelize.define('users', {
     timestamps: false
 })
 
+
+// one to ,many relationship
 User.hasMany(tokenUser, {
     foreignKey: 'userID'
 })
-
 
 
 //Checking email and password for login
@@ -73,8 +74,6 @@ User.findByCredentials = async(email, password) => {
     }
     return user
 }
-
-
 
 
 // Hash the plain text password before saving

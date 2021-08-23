@@ -1,10 +1,10 @@
 const express = require('express')
 const router = new express.Router()
 const validator = require('validator')
-const User = require('../models/user.model')
+const User = require('../models/User.model')
 const userToken = require('../models/UserTokens.model')
 const jwt = require('jsonwebtoken')
-const auth = require('../middleware/auth.middleware')
+const auth = require('../middleware/Auth.middleware')
 require('dotenv').config()
 router.get('/getAll', async(req, res) => {
     try {
@@ -70,7 +70,7 @@ router.post('/login', async(req, res) => {
 
 
 
-router.post('/logout', auth, async(req, res) => {
+router.delete('/logout', auth, async(req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
         res.status(200).send('Logout!')

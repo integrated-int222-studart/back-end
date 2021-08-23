@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../models/user.model')
+const User = require('../models/User.model')
 const userTokens = require('../models/UserTokens.model')
 require('dotenv').config()
 const auth = async(req, res, next) => {
@@ -12,7 +12,8 @@ const auth = async(req, res, next) => {
         if (!user) {
             throw new Error()
         }
-        const isMatchToken = await userTokens.findOne({ token })
+        const isMatchToken = await userTokens.findOne({ where: { userID: decode.userID } })
+        console.log(isMatchToken)
         if (!isMatchToken) {
             throw new Error()
         }
