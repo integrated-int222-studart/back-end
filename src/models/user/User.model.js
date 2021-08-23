@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/Sequelize')
 const bcrypt = require('bcryptjs')
-const tokenUser = require('./UserTokens.model')
+const userToken = require('./UserTokens.model')
 const User = sequelize.define('users', {
     userID: {
         autoIncrement: true,
@@ -56,7 +56,7 @@ const User = sequelize.define('users', {
 
 
 // one to ,many relationship
-User.hasMany(tokenUser, {
+User.hasMany(userToken, {
     foreignKey: 'userID'
 })
 
@@ -64,7 +64,6 @@ User.hasMany(tokenUser, {
 //Checking email and password for login
 User.findByCredentials = async(email, password) => {
     const user = await User.findOne({ where: { email: email } })
-    console.log({ user })
     if (!user) {
         throw Error('Unable to login')
     }

@@ -1,6 +1,8 @@
-const DataTypes = require('sequelize')
+const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/Sequelize')
-const userToken = sequelize.define('usertokens', {
+const bcrypt = require('bcryptjs')
+
+const adminToken = sequelize.define('admintokens', {
     tokensID: {
         autoIncrement: true,
         primaryKey: true,
@@ -8,11 +10,11 @@ const userToken = sequelize.define('usertokens', {
         allowNull: false
     },
     token: {
-        type: DataTypes.STRING(100),
-        allowNull: false
-    },
+        type: DataTypes.STRING(255),
+        allowNull: true,
+    }
 }, {
     timestamps: false
 })
 
-module.exports = userToken
+module.exports = adminToken

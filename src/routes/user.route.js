@@ -4,17 +4,15 @@ const validator = require('validator')
 const User = require('../models/user/User.model')
 const userToken = require('../models/user/UserTokens.model')
 const jwt = require('jsonwebtoken')
-const auth = require('../middleware/Auth.middleware')
+const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 router.get('/getAll', async(req, res) => {
     try {
         const users = await User.findAll({
             include: [userToken]
         })
-        if (users) {
-            res.send(users)
-        } else {
-            res.status(500).send()
+        if (!users) {
+            throw new Error()
         }
     } catch (error) {
         res.status(404).send(error)
@@ -67,10 +65,7 @@ router.post('/login', async(req, res) => {
     }
 })
 
-
-
-
-router.delete('/logout', auth, async(req, res) => {
+router.delete('/logout', authUser, async(req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
         res.status(200).send('Logout!')
@@ -78,7 +73,7 @@ router.delete('/logout', auth, async(req, res) => {
         res.send(error)
     }
 })
-router.get('/profile', auth, (req, res) => {
+router.get('/profile', authUser, (req, res) => {
     console.log(req.user)
     res.send({ user: req.user, token: req.token })
 })
