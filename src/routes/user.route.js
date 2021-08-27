@@ -3,17 +3,27 @@ const router = new express.Router()
 const validator = require('validator')
 const User = require('../models/user/User.model')
 const userToken = require('../models/user/UserTokens.model')
+const Product = require('../models/products/product.model')
+const productType = require('../models/products/productType.model')
 const jwt = require('jsonwebtoken')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 router.get('/getAll', async(req, res) => {
     try {
         const users = await User.findAll({
-            include: [userToken]
+            include: [{
+                model: Product,
+                include: {
+                    model: productType
+                }
+            }, {
+                model: userToken
+            }, ],
         })
         if (!users) {
             throw new Error()
         }
+        res.send(users)
     } catch (error) {
         res.status(404).send(error)
     }
@@ -51,7 +61,11 @@ router.post('/register', async(req, res) => {
 
 router.post('/login', async(req, res) => {
     try {
+
         const user = await User.findByCredentials(req.body.email, req.body.password)
+        if (!user) {
+            throw new Error()
+        }
         const token = jwt.sign({ userID: user.userID }, process.env.JWT_SECRET)
         const generateTokenID = await new userToken({
             userID: user.userID,
@@ -80,8 +94,10 @@ router.delete('/logoutAll', authUser, async(req, res) => {
     }
 })
 router.get('/profile', authUser, (req, res) => {
-    // console.log(req.user)
+    console.log(req.user)
     res.send({ user: req.user, token: req.token })
 })
+
+
 
 module.exports = router

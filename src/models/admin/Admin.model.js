@@ -22,6 +22,7 @@ const Admin = sequelize.define('admins', {
     timestamps: false
 })
 
+//one to many for Admin to adminToken
 Admin.hasMany(adminToken, {
     foreignKey: 'adminID'
 })
@@ -30,11 +31,11 @@ Admin.hasMany(adminToken, {
 Admin.findByCredentials = async(email, password) => {
     const admin = await Admin.findOne({ where: { email: email } })
     if (!admin) {
-        throw Error('Unable to login')
+        throw new Error('Unable to login')
     }
     const isMatch = await bcrypt.compare(password, admin.password)
     if (!isMatch) {
-        throw Error('Unable to login')
+        throw new Error('Unable to login')
     }
     return admin
 }

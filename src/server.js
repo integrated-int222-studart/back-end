@@ -5,7 +5,9 @@ const port = process.env.PORT || 3000
 app.use(express.json())
 const adminRoute = require('./routes/admin.route')
 const userRoute = require('./routes/user.route')
-app.use('/user', userRoute)
+const productRoute = require('./routes/product.route')
+const typeRoute = require('./routes/type.route')
+app.use('/user', userRoute, productRoute, typeRoute)
 app.use('/admin', adminRoute)
 app.get('/', (req, res) => {
     res.send('Test Server')

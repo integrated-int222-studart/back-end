@@ -23,7 +23,6 @@ const User = sequelize.define('users', {
         type: DataTypes.STRING(45),
         allowNull: false,
         unique: true,
-
     },
     firstName: {
         type: DataTypes.STRING(45),
@@ -54,8 +53,7 @@ const User = sequelize.define('users', {
     timestamps: false
 })
 
-
-// one to ,many relationship
+//one to many for User to userTokens
 User.hasMany(userToken, {
     foreignKey: 'userID'
 })
@@ -80,5 +78,7 @@ User.beforeCreate(async function(user) {
     const salt = await bcrypt.genSalt(8)
     user.password = await bcrypt.hash(user.password, salt)
 })
+
+
 
 module.exports = User

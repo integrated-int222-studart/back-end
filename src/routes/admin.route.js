@@ -1,6 +1,5 @@
 const express = require('express')
 const router = new express.Router()
-const validator = require('validator')
 const Admin = require('../models/admin/Admin.model')
 const adminToken = require('../models/admin/AdminTokens.model')
 const jwt = require('jsonwebtoken')
@@ -21,12 +20,14 @@ router.get('/getAll', async(req, res) => {
     }
 })
 
+
 router.post('/login', async(req, res) => {
     try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password)
+        if (!admin) {
+            throw new Error()
+        }
         const token = jwt.sign({ adminID: admin.adminID }, process.env.JWT_SECRET)
-            // console.log(admin.adminID)
-            // console.log(token)
         const generateTokenID = await new adminToken({
             adminID: admin.adminID,
             token: token,
@@ -38,6 +39,7 @@ router.post('/login', async(req, res) => {
     }
 })
 
+//logout one session 
 router.delete('/logout', authAdmin, async(req, res) => {
     try {
         await adminToken.destroy({ where: { token: req.token }, force: true })
@@ -47,6 +49,8 @@ router.delete('/logout', authAdmin, async(req, res) => {
     }
 })
 
+
+//logout every session
 router.delete('/logoutAll', authAdmin, async(req, res) => {
     try {
         await adminToken.destroy({ where: { adminID: req.admin.adminID }, force: true })
