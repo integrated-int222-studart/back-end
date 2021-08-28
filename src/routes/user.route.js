@@ -11,8 +11,10 @@ require('dotenv').config()
 router.get('/getAll', async(req, res) => {
     try {
         const users = await User.findAll({
+            attributes: { exclude: ['password'] },
             include: [{
                 model: Product,
+                attributes: { exclude: ['ownerID', 'productType'] },
                 include: {
                     model: productType
                 }
@@ -59,7 +61,7 @@ router.post('/register', async(req, res) => {
         if (!validator.isEmail(req.body.email)) res.send('Email is invalid')
         if (user) {
             await user.save()
-            res.status(201).send(user)
+            res.status(201).send("Successful")
         }
     } catch (error) {
         res.status(400).send(error)
@@ -101,7 +103,6 @@ router.delete('/logoutAll', authUser, async(req, res) => {
     }
 })
 router.get('/profile', authUser, (req, res) => {
-    console.log(req.user)
     res.send({ user: req.user, token: req.token })
 })
 
