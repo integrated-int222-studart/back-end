@@ -42,6 +42,14 @@ router.get('/tokens', async(req, res) => {
 })
 
 router.post('/register', async(req, res) => {
+    const checkKeyBody = Object.keys(req.body)
+    const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school', 'image']
+    const isValidKey = checkKeyBody.every((checkKeyBody) => {
+        return allowedKey.includes(checkKeyBody)
+    })
+    if (!isValidKey) {
+        res.status(500).send('Invalid key!')
+    }
     try {
         const user = await new User(req.body)
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })
@@ -53,7 +61,6 @@ router.post('/register', async(req, res) => {
             await user.save()
             res.status(201).send(user)
         }
-
     } catch (error) {
         res.status(400).send(error)
     }

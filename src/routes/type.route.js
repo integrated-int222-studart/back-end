@@ -16,10 +16,10 @@ router.get('/typeProd', async(req, res) => {
     res.send(typeProd)
 })
 router.post('/addType', async(req, res) => {
-    const checkBody = Object.keys(req.body)
+    const checkKeyBody = Object.keys(req.body)
     const allowedKey = ['typeName']
-    const isValidKey = checkBody.every((checkBody) => {
-        return allowedKey.includes(checkBody)
+    const isValidKey = checkKeyBody.every((checkKeyBody) => {
+        return allowedKey.includes(checkKeyBody)
     })
     if (!isValidKey) {
         return res.status(404).send('Invalid key!')
