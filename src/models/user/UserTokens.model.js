@@ -1,5 +1,5 @@
 const DataTypes = require('sequelize')
-const sequelize = require('../../database/Sequelize')
+const sequelize = require('../../database/sequelize')
 const userToken = sequelize.define('usertokens', {
     tokensID: {
         autoIncrement: true,

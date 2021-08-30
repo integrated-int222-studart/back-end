@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize')
-const sequelize = require('../../database/Sequelize')
+const sequelize = require('../../database/sequelize')
 const bcrypt = require('bcryptjs')
 const userToken = require('./UserTokens.model')
     // const Product = require('../products/product.model')

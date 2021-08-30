@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize')
-const sequelize = require('../../database/Sequelize')
-const bcrypt = require('bcryptjs')
+const sequelize = require('../../database/sequelize')
 
 const adminToken = sequelize.define('admintokens', {
     tokensID: {

@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize')
-const sequelize = require('../../database/Sequelize')
+const sequelize = require('../../database/sequelize')
 const Type = sequelize.define('type', {
     typeID: {
         type: DataTypes.INTEGER,
