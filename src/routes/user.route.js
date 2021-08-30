@@ -6,57 +6,66 @@ const userToken = require('../models/user/UserTokens.model')
 const Product = require('../models/products/product.model')
 const productType = require('../models/products/productType.model')
 const Style = require('../models/products/style.model')
+const Appoval = require('../models/ManyToMany/approval.model')
+const Admin = require('../models/admin/Admin.model')
 const jwt = require('jsonwebtoken')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
 router.get('/getAll', async(req, res) => {
-    // try {
-    const users = await User.findAll({
-        as: 'users',
-        attributes: { exclude: ['password'] },
-        include: [{
-                model: Product,
-                as: 'products',
-                attributes: { exclude: ['ownerID', 'productType'] },
-                include: [{
-                    model: productType,
-                }, {
-                    model: Style,
-                }],
-            },
-            {
-                model: Product,
-                as: 'productFavorite',
-                attributes: { exclude: ['favorlite'] },
-                include: [{
-                    model: productType,
-                }, {
-                    model: Style,
-                }],
-            },
-            {
-                model: Product,
-                as: 'productCollection',
-                // attributes: { exclude: ['prodID', 'userID'] },
-                include: [{
-                    model: productType,
-                }, {
-                    model: Style,
-                }],
-            },
-            {
-                model: userToken
-            },
-        ],
-    })
-    if (!users) {
-        throw new Error()
+    try {
+        const users = await User.findAll({
+            as: 'users',
+            attributes: { exclude: ['password'] },
+            include: [{
+                    model: Product,
+                    as: 'products',
+                    // attributes: { exclude: ['ownerID', 'productType'] },
+                    include: [{
+                        model: productType,
+                    }, {
+                        model: Style,
+                    }, {
+                        model: Admin,
+                        as: 'adminAppoval',
+                        attributes: { exclude: ['password'] },
+                    }],
+                },
+                {
+                    model: Product,
+                    as: 'productFavorite',
+                    // attributes: { exclude: ['favorlite'] },
+                    include: [{
+                        model: productType,
+                    }, {
+                        model: Style,
+                        // attributes: { exclude: ['productstyles'] },
+                    }],
+                },
+                {
+                    model: Product,
+                    as: 'productCollection',
+                    // attributes: { exclude: ['ownerID'] },
+                    include: [{
+                        model: productType,
+                    }, {
+                        model: Style,
+                        // attributes: { exclude: ['productstyles'] },
+                    }],
+                },
+
+                {
+                    model: userToken
+                },
+            ],
+        })
+        if (!users) {
+            throw new Error()
+        }
+        res.send(users)
+    } catch (error) {
+        res.status(404).send(error)
     }
-    res.send(users)
-        // } catch (error) {
-        //     res.status(404).send(error)
-        // }
 })
 
 router.get('/tokens', async(req, res) => {

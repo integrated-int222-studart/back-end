@@ -7,6 +7,8 @@ const Favorite = require('../ManyToMany/favorite.model')
 const Collection = require('../ManyToMany/collections.model')
 const Style = require('../products/style.model')
 const productStyle = require('../ManyToMany/productStyles.model')
+const Appoval = require('../ManyToMany/approval.model')
+const Admin = require('../admin/Admin.model')
 const Product = sequelize.define('products', {
     prodID: {
         type: DataTypes.INTEGER,
@@ -93,10 +95,43 @@ Product.belongsToMany(Style, {
     foreignKey: 'prodID'
 })
 
+
+//M:N ProductAppoval
+Admin.belongsToMany(Product, {
+    through: Appoval,
+    as: 'prodAppoval',
+    timestamps: false,
+    foreignKey: 'adminID'
+})
+Product.belongsToMany(Admin, {
+    through: Appoval,
+    as: 'adminAppoval',
+    timestamps: false,
+    foreignKey: 'prodID'
+})
+
 //Product -->> Images
 Product.hasMany(Images, {
     foreignKey: 'prodID'
 })
+
+
+// const test = async() => {
+//     const test = await User.findAll({
+//         as: 'users',
+//         include: {
+//             model: Product,
+//             as: 'products',
+//             include: {
+//                 model: Admin,
+//                 as: 'adminAppoval'
+//             }
+//         }
+//     })
+//     console.log(JSON.stringify(test))
+// }
+
+// test()
 
 async() => await sequelize.sync({ force: true })
 module.exports = Product
