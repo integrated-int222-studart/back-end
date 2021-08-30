@@ -5,31 +5,60 @@ const User = require('../models/user/User.model')
 const userToken = require('../models/user/UserTokens.model')
 const Product = require('../models/products/product.model')
 const productType = require('../models/products/productType.model')
+const Style = require('../models/products/style.model')
 const jwt = require('jsonwebtoken')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
+
 router.get('/getAll', async(req, res) => {
-    try {
-        const users = await User.findAll({
-            attributes: { exclude: ['password'] },
-            include: [{
+    // try {
+    const users = await User.findAll({
+        as: 'users',
+        attributes: { exclude: ['password'] },
+        include: [{
                 model: Product,
+                as: 'products',
                 attributes: { exclude: ['ownerID', 'productType'] },
-                include: {
-                    model: productType
-                }
-            }, {
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                }],
+            },
+            {
+                model: Product,
+                as: 'productFavorite',
+                attributes: { exclude: ['favorlite'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                }],
+            },
+            {
+                model: Product,
+                as: 'productCollection',
+                // attributes: { exclude: ['prodID', 'userID'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                }],
+            },
+            {
                 model: userToken
-            }, ],
-        })
-        if (!users) {
-            throw new Error()
-        }
-        res.send(users)
-    } catch (error) {
-        res.status(404).send(error)
+            },
+        ],
+    })
+    if (!users) {
+        throw new Error()
     }
+    res.send(users)
+        // } catch (error) {
+        //     res.status(404).send(error)
+        // }
 })
+
 router.get('/tokens', async(req, res) => {
     try {
         const token = await userToken.findAll()
@@ -53,7 +82,18 @@ router.post('/register', async(req, res) => {
         res.status(500).send('Invalid key!')
     }
     try {
-        const user = await new User(req.body)
+        const user = await new User({
+            username: req.body.username.toLowerCase(),
+            email: req.body.email.toLowerCase(),
+            password: req.body.password,
+            status: req.body.status,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            description: req.body.description,
+            school: req.body.school,
+            image: req.body.image
+        })
+
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })
         const userWithUsername = await User.findOne({ where: { username: req.body.username } })
         if (userWithUsername) res.send('Username has been used!')
@@ -70,7 +110,6 @@ router.post('/register', async(req, res) => {
 
 router.post('/login', async(req, res) => {
     try {
-
         const user = await User.findByCredentials(req.body.email, req.body.password)
         if (!user) {
             throw new Error()
@@ -86,6 +125,7 @@ router.post('/login', async(req, res) => {
         res.status(400).send('Email or Password is wrong!')
     }
 })
+
 router.delete('/logout', authUser, async(req, res) => {
     try {
         await userToken.destroy({ where: { token: req.token }, force: true })
@@ -94,6 +134,7 @@ router.delete('/logout', authUser, async(req, res) => {
         res.send(error)
     }
 })
+
 router.delete('/logoutAll', authUser, async(req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
@@ -102,6 +143,7 @@ router.delete('/logoutAll', authUser, async(req, res) => {
         res.send(error)
     }
 })
+
 router.get('/profile', authUser, (req, res) => {
     res.send({ user: req.user, token: req.token })
 })

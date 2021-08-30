@@ -20,7 +20,6 @@ router.get('/getAll', async(req, res) => {
     }
 })
 
-
 router.post('/login', async(req, res) => {
     try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password)
@@ -48,7 +47,6 @@ router.delete('/logout', authAdmin, async(req, res) => {
         res.send(error)
     }
 })
-
 
 //logout every session
 router.delete('/logoutAll', authAdmin, async(req, res) => {

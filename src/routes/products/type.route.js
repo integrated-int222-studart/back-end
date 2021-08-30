@@ -1,20 +1,8 @@
-const productType = require('../models/products/productType.model')
-const Product = require('../models/products/product.model')
+const productType = require('../../models/products/productType.model')
+const Product = require('../../models/products/product.model')
 const express = require('express')
 const router = new express.Router()
 
-router.get('/allType', async(req, res) => {
-    const types = await productType.findAll()
-    res.send(types)
-})
-router.get('/typeProd', async(req, res) => {
-    const typeProd = await productType.findAll({
-        include: {
-            model: Product
-        }
-    })
-    res.send(typeProd)
-})
 router.post('/addType', async(req, res) => {
     const checkKeyBody = Object.keys(req.body)
     const allowedKey = ['typeName']
@@ -36,4 +24,32 @@ router.post('/addType', async(req, res) => {
     }
 
 })
+
+router.get('/allType', async(req, res) => {
+    const types = await productType.findAll()
+    res.send(types)
+})
+
+router.get('/typeProd', async(req, res) => {
+    const typeProd = await productType.findAll({
+        include: {
+            model: Product
+        }
+    })
+    res.send(typeProd)
+})
+
+router.get('/typeProd', async(req, res) => {
+    try {
+        const typeProd = await productType.findAll({
+            include: {
+                model: Product
+            }
+        })
+        res.send(typeProd)
+    } catch (error) {
+        res.send(error)
+    }
+})
+
 module.exports = router

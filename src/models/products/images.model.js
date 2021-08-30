@@ -1,14 +1,14 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/sequelize')
 
-const Images = sequelize.define('Images', {
-    ImageID: {
+const Images = sequelize.define('images', {
+    imageID: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
     },
-    Image: {
+    image: {
         type: DataTypes.BLOB('long'),
         allowNull: true
     }
@@ -17,10 +17,5 @@ const Images = sequelize.define('Images', {
     timestamps: false
 })
 
-// const test = async() => {
-//     const test = await Images.findAll()
-//     console.log(test)
-// }
-// test()
 
 module.exports = Images

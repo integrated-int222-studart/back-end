@@ -1,8 +1,8 @@
-const Product = require('../models/products/product.model')
-const productType = require('../models/products/productType.model')
+const Product = require('../../models/products/product.model')
+const Images = require('../../models/products/images.model')
 const express = require('express')
 const router = new express.Router()
-const { authUser } = require('../middleware/auth.middleware')
+const { authUser } = require('../../middleware/auth.middleware')
 
 router.post('/addProduct', authUser, async(req, res) => {
     const checkKeyBody = Object.keys(req.body)
@@ -38,28 +38,22 @@ router.get('/allProduct', async(req, res) => {
         res.status(500).send(error)
     }
 })
+
 router.get('/product', authUser, async(req, res) => {
     try {
         const product = await Product.findAll({
-            where: { ownerID: req.user.userID },
-        }, )
+                where: { ownerID: req.user.userID },
+                include: [{
+                    model: Images,
+                    attributes: { exclude: ['prodID'] }
+                }]
+            }
+
+        )
         if (!product) res.send('Product not found!')
         await res.send(product)
     } catch (error) {
         res.status(500).send(error)
-    }
-})
-
-router.get('/typeProd', async(req, res) => {
-    try {
-        const typeProd = await productType.findAll({
-            include: {
-                model: Product
-            }
-        })
-        res.send(typeProd)
-    } catch (error) {
-        res.send(error)
     }
 })
 
@@ -69,5 +63,6 @@ router.get('/prodType', async(req, res) => {
     })
     res.send(type)
 })
+
 
 module.exports = router

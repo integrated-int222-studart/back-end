@@ -3,8 +3,6 @@ const User = require('../models/user/User.model')
 const userTokens = require('../models/user/UserTokens.model')
 const Admin = require('../models/admin/Admin.model')
 const adminTokens = require('../models/admin/AdminTokens.model')
-const Product = require('../models/products/product.model')
-const productType = require('../models/products/productType.model')
 require('dotenv').config()
 const authUser = async(req, res, next) => {
     try {

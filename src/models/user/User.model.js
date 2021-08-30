@@ -2,6 +2,8 @@ const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/Sequelize')
 const bcrypt = require('bcryptjs')
 const userToken = require('./UserTokens.model')
+    // const Product = require('../products/product.model')
+    // const Favorite = require('../ManyToMany/favorite.model')
 const User = sequelize.define('users', {
     userID: {
         autoIncrement: true,
@@ -17,12 +19,13 @@ const User = sequelize.define('users', {
     },
     password: {
         type: DataTypes.STRING(200),
-        allowNull: false
+        allowNull: false,
     },
     email: {
         type: DataTypes.STRING(45),
         allowNull: false,
         unique: true,
+        lowercase: true
     },
     firstName: {
         type: DataTypes.STRING(45),
@@ -58,18 +61,23 @@ User.hasMany(userToken, {
     foreignKey: 'userID'
 })
 
-
 //Checking email and password for login
 User.findByCredentials = async(email, password) => {
-    const user = await User.findOne({ where: { email: email } })
+    const user = await User.findOne({
+        where: { email: email },
+    })
     if (!user) {
-        throw Error('Unable to login')
+        throw new Error()
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-        throw Error('Unable to login')
+        throw new Error()
     }
-    return user
+    const userNotPass = await User.findOne({
+        where: { email: email },
+        attributes: { exclude: ['password'] }
+    })
+    return userNotPass
 }
 
 

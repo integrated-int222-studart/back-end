@@ -1,7 +1,12 @@
 const { DataTypes } = require('sequelize')
-const sequelize = require('../../database/Sequelize')
-const productType = require('../products/productType.model')
+const sequelize = require('../../database/sequelize')
+const productType = require('./productType.model')
 const User = require('../user/User.model')
+const Images = require('./images.model')
+const Favorite = require('../ManyToMany/favorite.model')
+const Collection = require('../ManyToMany/collections.model')
+const Style = require('../products/style.model')
+const productStyle = require('../ManyToMany/productStyles.model')
 const Product = sequelize.define('products', {
     prodID: {
         type: DataTypes.INTEGER,
@@ -29,18 +34,68 @@ const Product = sequelize.define('products', {
     timestamps: false
 })
 
-User.hasMany(Product, {
-    foreignKey: "ownerID"
-})
+//User -->> Product <<-- productType
+User.hasMany(
+    Product, {
+        as: 'products',
+        foreignKey: 'ownerID'
+    })
 Product.belongsTo(User, {
-    foreignKey: "ownerID"
+    as: 'users',
+    foreignKey: 'ownerID'
 })
-
 productType.hasMany(Product, {
-    foreignKey: "productType"
+    foreignKey: 'productType'
 })
 Product.belongsTo(productType, {
     foreignKey: 'productType'
+})
+
+//M:N Favorite 
+User.belongsToMany(Product, {
+    through: Favorite,
+    as: 'productFavorite',
+    timestamps: false,
+    foreignKey: 'userID'
+})
+Product.belongsToMany(User, {
+    through: Favorite,
+    as: 'usersFavorite',
+    timestamps: false,
+    foreignKey: 'prodID'
+})
+
+//M:N Collection
+User.belongsToMany(Product, {
+    through: Collection,
+    as: 'productCollection',
+    timestamps: false,
+    foreignKey: 'userID'
+})
+
+Product.belongsToMany(User, {
+    through: Collection,
+    as: 'userCollection',
+    timestamps: false,
+    foreignKey: 'prodID'
+})
+
+//M:N ProductStyle
+Style.belongsToMany(Product, {
+    through: productStyle,
+    as: 'productStyle',
+    timestamps: false,
+    foreignKey: 'styleID'
+})
+Product.belongsToMany(Style, {
+    through: productStyle,
+    timestamps: false,
+    foreignKey: 'prodID'
+})
+
+//Product -->> Images
+Product.hasMany(Images, {
+    foreignKey: 'prodID'
 })
 
 async() => await sequelize.sync({ force: true })
