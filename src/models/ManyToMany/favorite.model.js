@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/sequelize')
 const Product = require('../products/product.model')
-const Favorite = sequelize.define('favorlite', {
+const Favorite = sequelize.define('favorite', {
     userID: {
         type: DataTypes.INTEGER,
         references: {
