@@ -2,8 +2,6 @@ const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/sequelize')
 const bcrypt = require('bcryptjs')
 const userToken = require('./UserTokens.model')
-    // const Product = require('../products/product.model')
-    // const Favorite = require('../ManyToMany/favorite.model')
 const User = sequelize.define('users', {
     userID: {
         autoIncrement: true,

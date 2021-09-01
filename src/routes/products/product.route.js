@@ -64,5 +64,22 @@ router.get('/prodType', async(req, res) => {
     res.send(type)
 })
 
+router.get('/page', async(req, res) => {
+    try {
+        const page = parseInt(req.body.page || 1)
+        const size = parseInt(req.body.size || 5)
+        const query = req.body.query || ''
+        const pages = await Product.Pagination(page, size, query)
+        if (!pages) {
+            res.status(404).send('Not found item!')
+        } else {
+
+        }
+        res.send(pages)
+    } catch (error) {
+        res.status(500).send(error)
+    }
+
+})
 
 module.exports = router

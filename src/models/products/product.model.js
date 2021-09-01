@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize')
+const { DataTypes, Op } = require('sequelize')
 const sequelize = require('../../database/sequelize')
 const productType = require('./productType.model')
 const User = require('../user/User.model')
@@ -115,23 +115,18 @@ Product.hasMany(Images, {
     foreignKey: 'prodID'
 })
 
+//paging
+Product.Pagination = async(page, size, query) => {
+    const pageAndItem = await Product.findAll({
+        limit: size || 5,
+        offset: (page - 1) || 0 * size,
+        where: {
+            prodName: {
+                [Op.like]: `%${query}%`
+            }
+        }
+    })
+    return pageAndItem
+}
 
-// const test = async() => {
-//     const test = await User.findAll({
-//         as: 'users',
-//         include: {
-//             model: Product,
-//             as: 'products',
-//             include: {
-//                 model: Admin,
-//                 as: 'adminAppoval'
-//             }
-//         }
-//     })
-//     console.log(JSON.stringify(test))
-// }
-
-// test()
-
-async() => await sequelize.sync({ force: true })
 module.exports = Product

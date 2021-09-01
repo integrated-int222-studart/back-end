@@ -8,5 +8,7 @@ const sequelize = new Sequelize(process.env.DATABASE, process.env.USER, process.
         freezeTableName: true
     }
 });
-
+// sequelize.sync({ force: true }).then(() => {
+//     console.log("Drop and re-sync db.");
+// });
 module.exports = sequelize
