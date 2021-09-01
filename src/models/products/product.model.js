@@ -119,7 +119,7 @@ Product.hasMany(Images, {
 Product.Pagination = async(page, size, query) => {
     const pageAndItem = await Product.findAll({
         limit: size || 5,
-        offset: (page - 1) || 0 * size,
+        offset: (page - 1) * size,
         where: {
             prodName: {
                 [Op.like]: `%${query}%`
