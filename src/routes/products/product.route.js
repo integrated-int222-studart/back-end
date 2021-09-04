@@ -66,8 +66,8 @@ router.get('/prodType', async(req, res) => {
 
 router.get('/page', async(req, res) => {
     try {
-        const page = parseInt(req.body.page || 1)
-        const size = parseInt(req.body.size || 5)
+        const page = parseInt(req.body.page) || 1
+        const size = parseInt(req.body.size) || 5
         const query = req.body.query || ''
         const pages = await Product.Pagination(page, size, query)
         if (!pages) {
