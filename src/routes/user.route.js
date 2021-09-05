@@ -7,6 +7,7 @@ const Product = require('../models/products/product.model')
 const productType = require('../models/products/productType.model')
 const Style = require('../models/products/style.model')
 const Admin = require('../models/admin/Admin.model')
+const Image = require('../models/products/images.model')
 const jwt = require('jsonwebtoken')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
@@ -24,6 +25,9 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                    },
+                    {
+                        model: Image
                     }, {
                         model: Admin,
                         as: 'adminAppoval',
