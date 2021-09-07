@@ -11,6 +11,7 @@ services:
  
   mysqldb:
     image: mysql
+    ports: "3306:3306"
     networks:
       - studart-network
     environment:
