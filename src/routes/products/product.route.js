@@ -71,7 +71,21 @@ router.get('/productById/:id', async(req,res)=>{
         const productById = await Product.findOne({
             where:{
                 prodID:id
-            }
+            },
+            include: [{
+                model: productType,
+            }, {
+                model: Style,
+                as: 'style',
+                attributes: { exclude: ['productStyles'] }
+            },
+            {
+                model: Images
+            }, {
+                model: Admin,
+                as: 'adminAppoval',
+                attributes: { exclude: ['password'] },
+            }]
         })
         console.log(productById)
         res.send(productById)
