@@ -13,7 +13,7 @@ const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
 router.get('/getAll', async(req, res) => {
-    try {
+    // try {
         const users = await User.findAll({
             as: 'users',
             attributes: { exclude: ['password'] },
@@ -25,6 +25,7 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                        as: 'style'
                     },
                     {
                         model: Image
@@ -42,6 +43,8 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                        as: 'style'
+                        
                         // attributes: { exclude: ['productstyles'] },
                     }],
                 },
@@ -53,6 +56,7 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                        as: 'style'
                         // attributes: { exclude: ['productstyles'] },
                     }],
                 },
@@ -66,9 +70,9 @@ router.get('/getAll', async(req, res) => {
             throw new Error()
         }
         res.send(users)
-    } catch (error) {
-        res.status(404).send(error)
-    }
+    // } catch (error) {
+    //     res.status(404).send(error)
+    // }
 })
 
 router.get('/tokens', async(req, res) => {
