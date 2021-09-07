@@ -16,7 +16,6 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=Studart_System  
-      - MYSQL_USER=root
 
 networks:
   studart-network: 
