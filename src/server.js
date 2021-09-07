@@ -11,7 +11,7 @@ const imageRoute = require('./routes/products/images.route')
 app.use(cors({
     origin: '*'
 }))
-app.use('/user', userRoute, productRoute, typeRoute, imageRoute)
+app.use('/user', userRoute, typeRoute, imageRoute, productRoute)
 app.use('/admin', adminRoute)
 app.get('/', (req, res) => {
     res.send('Test Server')
