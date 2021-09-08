@@ -4,6 +4,9 @@ const productType = require('../../models/products/productType.model')
 const productStyle = require('../../models/ManyToMany/productStyles.model')
 const Style = require('../../models/products/style.model')
 const Admin = require('../../models/admin/Admin.model')
+const Favorite = require('../../models/ManyToMany/favorite.model')
+const Collection = require('../../models/ManyToMany/collections.model')
+const Approval = require('../../models/ManyToMany/approval.model')
 const express = require('express')
 const router = new express.Router()
 const { authUser } = require('../../middleware/auth.middleware')
@@ -49,12 +52,18 @@ router.post('/addProduct', authUser, async (req, res) => {
         res.status(500).send(error)
     }
 })
+
 router.delete('/deleteProduct/:id', async (req, res) => {
     try {
         const id = req.params.id
         if (!id) {
             res.status(400).send('Enter variable param')
         }
+        await Approval.destroy({where:{prodID: id}})
+        await Collection.destroy({where:{prodID: id}})
+        await Favorite.destroy({where:{prodID: id}})
+        await Images.destroy({where:{prodID: id}})
+        await productStyle.destroy({where:{ prodID: id}})
         await Product.destroy({ where: { prodID: id } })
         res.send('Product has been removed')
     } catch (error) {
