@@ -12,7 +12,6 @@ const router = new express.Router()
 const { authUser } = require('../../middleware/auth.middleware')
 
 
-
 router.post('/addProduct', authUser, async (req, res) => {
     const checkKeyBody = Object.keys(req.body)
     const allowedKey = ['prodName', 'manufacDate', 'prodDescription', 'price', 'productType', 'styleID', 'image']
@@ -38,16 +37,8 @@ router.post('/addProduct', authUser, async (req, res) => {
                     styleID: styleID
                 })
             });
-            const image = req.body.image
-            console.log(image)
-            image.forEach(image => {
-                Images.create({
-                    prodID: result.prodID,
-                    image: image
-                })
-            })
+            res.send('Product has been created')
         })
-        res.send('Product has been created')
     } catch (error) {
         res.status(500).send(error)
     }
@@ -59,11 +50,11 @@ router.delete('/deleteProduct/:id', async (req, res) => {
         if (!id) {
             res.status(400).send('Enter variable param')
         }
-        await Approval.destroy({where:{prodID: id}})
-        await Collection.destroy({where:{prodID: id}})
-        await Favorite.destroy({where:{prodID: id}})
-        await Images.destroy({where:{prodID: id}})
-        await productStyle.destroy({where:{ prodID: id}})
+        await Approval.destroy({ where: { prodID: id } })
+        await Collection.destroy({ where: { prodID: id } })
+        await Favorite.destroy({ where: { prodID: id } })
+        await Images.destroy({ where: { prodID: id } })
+        await productStyle.destroy({ where: { prodID: id } })
         await Product.destroy({ where: { prodID: id } })
         res.send('Product has been removed')
     } catch (error) {
@@ -71,15 +62,15 @@ router.delete('/deleteProduct/:id', async (req, res) => {
     }
 })
 
-router.get('/productById/:id', async(req,res)=>{   
+router.get('/productById/:id', async (req, res) => {
     try {
         const id = req.params.id
         if (!id) {
             res.status(400).send('Enter variable param')
         }
         const productById = await Product.findOne({
-            where:{
-                prodID:id
+            where: {
+                prodID: id
             },
             include: [{
                 model: productType,
@@ -102,8 +93,6 @@ router.get('/productById/:id', async(req,res)=>{
         res.status(500).send(error)
     }
 })
-
-
 router.get('/allProduct', async (req, res) => {
     try {
         const products = await Product.findAll({
@@ -115,7 +104,8 @@ router.get('/allProduct', async (req, res) => {
                 attributes: { exclude: ['productStyles'] }
             },
             {
-                model: Images
+                model: Images,
+                attributes: { exclude: ['data'] }
             }, {
                 model: Admin,
                 as: 'adminAppoval',
@@ -171,5 +161,8 @@ router.get('/page', async (req, res) => {
     }
 
 })
+
+
+
 
 module.exports = router
