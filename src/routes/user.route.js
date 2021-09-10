@@ -107,7 +107,7 @@ router.post('/register', async(req, res) => {
             lastName: req.body.lastName,
             description: req.body.description,
             school: req.body.school,
-            image: req.body.image
+            // image: req.body.image
         })
 
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })

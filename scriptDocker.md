@@ -13,3 +13,6 @@ docker container run --network studart-network --name studart-project -d --env-f
 
 <h1>Connection database server
 CONECTION=mysql://root:mypass123@13.76.182.102:3306/Studart_System
+
+<h1>phpmyadmin container
+docker run --name studart-myadmin -d --link studart-mysql:db --network studart-network -p 8081:80 phpmyadmin/phpmyadmin
