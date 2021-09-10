@@ -13,7 +13,7 @@ const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
 router.get('/getAll', async(req, res) => {
-    // try {
+    try {
         const users = await User.findAll({
             as: 'users',
             attributes: { exclude: ['password'] },
@@ -70,9 +70,9 @@ router.get('/getAll', async(req, res) => {
             throw new Error()
         }
         res.send(users)
-    // } catch (error) {
-    //     res.status(404).send(error)
-    // }
+    } catch (error) {
+        res.status(404).send(error)
+    }
 })
 
 router.get('/tokens', async(req, res) => {
@@ -90,7 +90,7 @@ router.get('/tokens', async(req, res) => {
 
 router.post('/register', async(req, res) => {
     const checkKeyBody = Object.keys(req.body)
-    const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school', 'image']
+    const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school']
     const isValidKey = checkKeyBody.every((checkKeyBody) => {
         return allowedKey.includes(checkKeyBody)
     })
