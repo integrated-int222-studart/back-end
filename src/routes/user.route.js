@@ -9,6 +9,8 @@ const Style = require('../models/products/style.model')
 const Admin = require('../models/admin/Admin.model')
 const Image = require('../models/products/images.model')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
+const {uploadFileUser }= require('../middleware/upload.middleware')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
@@ -16,7 +18,7 @@ router.get('/getAll', async(req, res) => {
     try {
         const users = await User.findAll({
             as: 'users',
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password','imageData'] },
             include: [{
                     model: Product,
                     as: 'products',
@@ -28,7 +30,9 @@ router.get('/getAll', async(req, res) => {
                         as: 'style'
                     },
                     {
-                        model: Image
+                        model: Image,
+                     attributes: { exclude: ['data'] },
+
                     }, {
                         model: Admin,
                         as: 'adminAppoval',
@@ -124,6 +128,28 @@ router.post('/register', async(req, res) => {
     }
 })
 
+router.post('/upload/image/:id',uploadFileUser.single('image'), async (req, res) =>{
+    if (req.file == undefined) {
+        return res.send(`You must select a file.`);
+    }
+    try {
+        await User.update({
+            imageType: req.file.mimetype,
+            imageName: req.file.originalname,
+            imageData: fs.readFileSync(
+                process.cwd() + "/src/assets/uploads/user/" + req.file.filename      
+            ) 
+        },{
+            where:{
+            userID: req.params.id
+            }
+        })
+        return res.send(`File has been uploaded.`);
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
 router.post('/login', async(req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
@@ -147,7 +173,7 @@ router.delete('/logout', authUser, async(req, res) => {
         await userToken.destroy({ where: { token: req.token }, force: true })
         res.status(200).send('Logout!')
     } catch (error) {
-        res.send(error)
+        res.status(500).send(error)
     }
 })
 
@@ -163,6 +189,21 @@ router.delete('/logoutAll', authUser, async(req, res) => {
 router.get('/profile', authUser, (req, res) => {
     res.send({ user: req.user, token: req.token })
 })
+
+router.get('/photo/:id', async (req, res) => {
+    const id = req.params.id
+    try {
+        const image = await User.findOne({ where: { userID: id } })
+        if (image) {
+            res.set('Content-Type', image.imageType)
+            res.end(image.imageData)
+        } else {
+            res.send('No image with that id!')
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+});
 
 
 

@@ -62,6 +62,20 @@ router.delete('/deleteProduct/:id', async (req, res) => {
     }
 })
 
+router.put('/edit/:id', async(req,res)=>{
+    const id = req.params.id
+    try {
+        await Product.update(req.body,{
+            where:{
+                prodID: id
+            }
+        })
+        res.send('Edit success!')
+    } catch (error) {
+        res.status(500).send(error)
+    }
+})
+
 router.get('/productById/:id', async (req, res) => {
     try {
         const id = req.params.id

@@ -45,10 +45,18 @@ const User = sequelize.define('users', {
         type: DataTypes.STRING(45),
         allowNull: true
     },
-    // image: {
-    //     type: DataTypes.BLOB('long'),
-    //     allowNull: true
-    // }
+    imageData: {
+        type: DataTypes.BLOB('long'),
+        allowNull: true
+    },
+    imageName:{
+        type: DataTypes.STRING(45),
+        allowNull: true
+    },
+    imageType:{
+        type: DataTypes.STRING(45),
+        allowNull: true
+    }
 
 }, {
     timestamps: false

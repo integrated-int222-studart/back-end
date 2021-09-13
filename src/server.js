@@ -13,6 +13,7 @@ app.use(cors({
     origin: '*'
 }))
 app.use('/user', userRoute, productRoute, typeRoute, )
+app.use('/product',productRoute)
 app.use('/upload',imageRoute)
 app.use('/admin', adminRoute)
 app.get('/', (req, res) => {

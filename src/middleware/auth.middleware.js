@@ -10,7 +10,7 @@ const authUser = async(req, res, next) => {
         const token = await req.header('Authorization').replace('Bearer ', '')
         const decode = jwt.verify(token, process.env.JWT_SECRET)
         const user = await User.findOne({
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password','imageData'] },
             where: { userID: decode.userID }
         })
         if (!user) {
