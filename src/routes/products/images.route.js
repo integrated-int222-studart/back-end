@@ -2,8 +2,9 @@ const Images = require('../../models/products/images.model')
 const express = require('express')
 const router = new express.Router()
 const {uploadFileProd} = require('../../middleware/upload.middleware')
+const { authUser } = require('../../middleware/auth.middleware')
 const fs = require('fs');
-router.post('/image/:id', uploadFileProd.single('image'), async (req, res) => {
+router.post('/image/:id', uploadFileProd.single('image'),authUser , async (req, res) => {
     if (req.file == undefined) {
         return res.send(`You must select a file.`);
     }
@@ -22,7 +23,7 @@ router.post('/image/:id', uploadFileProd.single('image'), async (req, res) => {
     }
 })
 
-router.get('/photo/:id', async (req, res) => {
+router.get('/photo/:id', authUser ,async (req, res) => {
     const id = req.params.id
     try {
         const image = await Images.findOne({ where: { imageID: id } })

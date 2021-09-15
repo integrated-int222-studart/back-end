@@ -128,7 +128,7 @@ router.post('/register', async(req, res) => {
     }
 })
 
-router.post('/upload/image/:id',uploadFileUser.single('image'), async (req, res) =>{
+router.post('/upload/image/:id',uploadFileUser.single('image'),authUser, async (req, res) =>{
     if (req.file == undefined) {
         return res.send(`You must select a file.`);
     }

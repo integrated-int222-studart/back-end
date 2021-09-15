@@ -10,7 +10,7 @@ const typeRoute = require('./routes/products/type.route')
 const imageRoute = require('./routes/products/images.route')
 
 app.use(cors({
-    origin: '*'
+    origin: process.env.ALLOWED_CORS
 }))
 app.use('/user', userRoute, productRoute, typeRoute, )
 app.use('/product',productRoute)
