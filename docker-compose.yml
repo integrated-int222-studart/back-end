@@ -1,0 +1,22 @@
+version: "3"
+services:
+  studart-project:
+    build: .
+    ports:
+      - "3000:3000"
+    networks:
+      - studart-network
+    depends_on:
+      - mysqldb
+ 
+  mysqldb:
+    image: mysql
+    ports: "3306:3306"
+    networks:
+      - studart-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=Studart_System  
+
+networks:
+  studart-network: 

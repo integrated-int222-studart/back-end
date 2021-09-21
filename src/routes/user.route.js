@@ -7,7 +7,10 @@ const Product = require('../models/products/product.model')
 const productType = require('../models/products/productType.model')
 const Style = require('../models/products/style.model')
 const Admin = require('../models/admin/Admin.model')
+const Image = require('../models/products/images.model')
 const jwt = require('jsonwebtoken')
+const fs = require('fs')
+const {uploadFileUser }= require('../middleware/upload.middleware')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
@@ -15,7 +18,7 @@ router.get('/getAll', async(req, res) => {
     try {
         const users = await User.findAll({
             as: 'users',
-            attributes: { exclude: ['password'] },
+            attributes: { exclude: ['password','imageData'] },
             include: [{
                     model: Product,
                     as: 'products',
@@ -24,6 +27,12 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                        as: 'style'
+                    },
+                    {
+                        model: Image,
+                     attributes: { exclude: ['data'] },
+
                     }, {
                         model: Admin,
                         as: 'adminAppoval',
@@ -38,6 +47,8 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                        as: 'style'
+                        
                         // attributes: { exclude: ['productstyles'] },
                     }],
                 },
@@ -49,6 +60,7 @@ router.get('/getAll', async(req, res) => {
                         model: productType,
                     }, {
                         model: Style,
+                        as: 'style'
                         // attributes: { exclude: ['productstyles'] },
                     }],
                 },
@@ -82,7 +94,7 @@ router.get('/tokens', async(req, res) => {
 
 router.post('/register', async(req, res) => {
     const checkKeyBody = Object.keys(req.body)
-    const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school', 'image']
+    const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school']
     const isValidKey = checkKeyBody.every((checkKeyBody) => {
         return allowedKey.includes(checkKeyBody)
     })
@@ -99,7 +111,7 @@ router.post('/register', async(req, res) => {
             lastName: req.body.lastName,
             description: req.body.description,
             school: req.body.school,
-            image: req.body.image
+            // image: req.body.image
         })
 
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })
@@ -113,6 +125,28 @@ router.post('/register', async(req, res) => {
         }
     } catch (error) {
         res.status(400).send(error)
+    }
+})
+
+router.post('/upload/image/:id',uploadFileUser.single('image'),authUser, async (req, res) =>{
+    if (req.file == undefined) {
+        return res.send(`You must select a file.`);
+    }
+    try {
+        await User.update({
+            imageType: req.file.mimetype,
+            imageName: req.file.originalname,
+            imageData: fs.readFileSync(
+                process.cwd() + "/src/assets/uploads/user/" + req.file.filename      
+            ) 
+        },{
+            where:{
+            userID: req.params.id
+            }
+        })
+        return res.send(`File has been uploaded.`);
+    } catch (error) {
+        res.status(500).send(error)
     }
 })
 
@@ -139,7 +173,7 @@ router.delete('/logout', authUser, async(req, res) => {
         await userToken.destroy({ where: { token: req.token }, force: true })
         res.status(200).send('Logout!')
     } catch (error) {
-        res.send(error)
+        res.status(500).send(error)
     }
 })
 
@@ -155,6 +189,21 @@ router.delete('/logoutAll', authUser, async(req, res) => {
 router.get('/profile', authUser, (req, res) => {
     res.send({ user: req.user, token: req.token })
 })
+
+router.get('/photo/:id', async (req, res) => {
+    const id = req.params.id
+    try {
+        const image = await User.findOne({ where: { userID: id } })
+        if (image) {
+            res.set('Content-Type', image.imageType)
+            res.end(image.imageData)
+        } else {
+            res.send('No image with that id!')
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+});
 
 
 

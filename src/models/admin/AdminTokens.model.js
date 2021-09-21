@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../../database/sequelize')
 
-const adminToken = sequelize.define('admintokens', {
+const adminToken = sequelize.define('adminTokens', {
     tokensID: {
         autoIncrement: true,
         primaryKey: true,

@@ -8,9 +8,17 @@ const Images = sequelize.define('images', {
         primaryKey: true,
         allowNull: false
     },
-    image: {
+    data: {
         type: DataTypes.BLOB('long'),
-        allowNull: true
+        allowNull: false
+    },
+    name:{
+        type: DataTypes.STRING(45),
+        allowNull: false
+    },
+    type:{
+        type: DataTypes.STRING(45),
+        allowNull: false
     }
 
 }, {

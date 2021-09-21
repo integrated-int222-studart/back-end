@@ -91,6 +91,7 @@ Style.belongsToMany(Product, {
 })
 Product.belongsToMany(Style, {
     through: productStyle,
+    as: 'style',
     timestamps: false,
     foreignKey: 'prodID'
 })
