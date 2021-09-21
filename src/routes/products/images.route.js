@@ -8,6 +8,7 @@ router.post('/image/:id', uploadFileProd.single('image'),authUser , async (req, 
     if (req.file == undefined) {
         return res.send(`You must select a file.`);
     }
+    
     try {
         await Images.create({
             prodID: req.params.id,

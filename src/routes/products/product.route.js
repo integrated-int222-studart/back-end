@@ -139,7 +139,7 @@ router.get('/product', authUser, async (req, res) => {
             where: { ownerID: req.user.userID },
             include: [{
                 model: Images,
-                attributes: { exclude: ['prodID'] }
+                attributes: { exclude: ['prodID','data'] }
             }]
         }
 
