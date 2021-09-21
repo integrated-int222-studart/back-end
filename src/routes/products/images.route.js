@@ -30,7 +30,7 @@ router.get('/photo/:id', authUser ,async (req, res) => {
         const image = await Images.findOne({ where: { imageID: id } })
         if (image) {
             res.set('Content-Type', image.type)
-            res.end(image.data)
+            res.send(image.data)
         } else {
             res.send('No image with that id!')
         }
