@@ -56,6 +56,10 @@ const User = sequelize.define('users', {
     imageType:{
         type: DataTypes.STRING(45),
         allowNull: true
+    },
+    imageURL:{
+        type: DataTypes.STRING(45),
+        allowNull: true
     }
 
 }, {

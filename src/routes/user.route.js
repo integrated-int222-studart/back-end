@@ -111,7 +111,6 @@ router.post('/register', async(req, res) => {
             lastName: req.body.lastName,
             description: req.body.description,
             school: req.body.school,
-            // image: req.body.image
         })
 
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })
@@ -136,6 +135,7 @@ router.post('/upload/image/:id',uploadFileUser.single('image'),authUser, async (
         await User.update({
             imageType: req.file.mimetype,
             imageName: req.file.originalname,
+            imageURL: `${process.env.IP_API}/user/photo/${req.params.id}`,
             imageData: fs.readFileSync(
                 process.cwd() + "/src/assets/uploads/user/" + req.file.filename      
             ) 

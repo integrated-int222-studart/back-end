@@ -8,14 +8,12 @@ const imageFilter = (req, file, cb) => {
     }
 };
 
-
-
-const storage = multer.diskStorage({
+const storageProduct = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, process.cwd() + "/src/assets/uploads/product/");
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        cb(null, 'file-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length-1]);
     },
 });
 const dirProduct = process.cwd() +'/src/assets/uploads/product'
@@ -23,7 +21,7 @@ const dirProduct = process.cwd() +'/src/assets/uploads/product'
         fs.mkdirSync(dirProduct,{recursive:true})
     }
 
-const uploadFileProd = multer({ storage: storage, fileFilter: imageFilter });
+const uploadFileProd = multer({ storage: storageProduct, fileFilter: imageFilter });
 
 const imageFilterUser = (req, file, cb) => {
     if (file.mimetype.startsWith("image")) {
@@ -39,7 +37,7 @@ const storageUser = multer.diskStorage({
         cb(null, process.cwd() + "/src/assets/uploads/user/");
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname);
+        cb(null, 'file-' + Date.now() + '.' + file.originalname.split('.')[file.originalname.split('.').length-1]);
     },
 });
 const dirUser = process.cwd() +'/src/assets/uploads/user'
