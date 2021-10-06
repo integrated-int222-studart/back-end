@@ -8,9 +8,7 @@ router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
     if (req.files == undefined) {
         return res.send(`You must select a file.`);
     }
-
     try {
-
         for (i = 0; i < req.files.length; i++) {
             console.log(req.files[i])
             await Images.create({

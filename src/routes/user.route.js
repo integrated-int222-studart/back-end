@@ -99,7 +99,7 @@ router.post('/register', async(req, res) => {
         return allowedKey.includes(checkKeyBody)
     })
     if (!isValidKey) {
-        res.status(500).send('Invalid key!')
+        res.status(400).send('Invalid key!')
     }
     try {
         const user = await new User({
@@ -123,11 +123,11 @@ router.post('/register', async(req, res) => {
             res.status(201).send("Successful")
         }
     } catch (error) {
-        res.status(400).send(error)
+        res.status(500).send({message: error.message})
     }
 })
 
-router.post('/upload/image/:id',uploadFileUser.single('image'),authUser, async (req, res) =>{
+router.post('/upload/image',uploadFileUser.single('image'),authUser, async (req, res) =>{
     if (req.file == undefined) {
         return res.send(`You must select a file.`);
     }
@@ -135,13 +135,13 @@ router.post('/upload/image/:id',uploadFileUser.single('image'),authUser, async (
         await User.update({
             imageType: req.file.mimetype,
             imageName: req.file.originalname,
-            imageURL: `${process.env.IP_API}/user/photo/${req.params.id}`,
+            imageURL: `${process.env.IP_API}/user/photo/${req.user.userID}`,
             imageData: fs.readFileSync(
                 process.cwd() + "/src/assets/uploads/user/" + req.file.filename      
             ) 
         },{
             where:{
-            userID: req.params.id
+            userID: req.user.userID
             }
         })
         return res.send(`File has been uploaded.`);

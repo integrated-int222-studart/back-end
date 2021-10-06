@@ -23,6 +23,8 @@ const dirProduct = process.cwd() +'/src/assets/uploads/product'
 
 const uploadFileProd = multer({ storage: storageProduct, fileFilter: imageFilter });
 
+
+
 const imageFilterUser = (req, file, cb) => {
     if (file.mimetype.startsWith("image")) {
         cb(null, true);
@@ -30,8 +32,6 @@ const imageFilterUser = (req, file, cb) => {
         cb("Please upload only images.", false);
     }
 };
-
-
 const storageUser = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, process.cwd() + "/src/assets/uploads/user/");
@@ -44,6 +44,7 @@ const dirUser = process.cwd() +'/src/assets/uploads/user'
     if(!fs.existsSync(dirUser)){
         fs.mkdirSync(dirUser,{recursive:true})
     }
+    
 const uploadFileUser= multer({ storage: storageUser, fileFilter: imageFilterUser });
 
 module.exports = {uploadFileProd, uploadFileUser}
