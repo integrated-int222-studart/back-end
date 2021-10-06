@@ -11,6 +11,9 @@ docker container run --cap-add=sys_nice --name studart-mysql --network studart-n
 <h1>Run image app in network
 docker container run --network studart-network --name studart-project -d --env-file .env -p 3000:3000 -d tein1142/studart-project
 
+docker container run --network studart-database-network --name studart-frontend -d --env-file .env -p 8080:80 -d studart-frontend
+
+
 <h1>Connection database server
 CONECTION=mysql://root:mypass123@13.76.182.102:3306/Studart_System
 

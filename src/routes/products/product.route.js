@@ -163,7 +163,7 @@ router.get('/page', async (req, res) => {
         const page = parseInt(req.body.page) || 1
         const size = parseInt(req.body.size) || 5
         const query = req.body.query || ''
-        const pages = await Product.Pagination(page, size, query)
+        const pages = await Product.pagination(page, size, query)
         if (!pages) {
             res.status(404).send('Item not found!')
         } else {

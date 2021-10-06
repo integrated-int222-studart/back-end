@@ -117,7 +117,7 @@ Product.hasMany(Images, {
 })
 
 //paging
-Product.Pagination = async(page, size, query) => {
+Product.pagination = async(page, size, query) => {
     const pageAndItem = await Product.findAll({
         limit: size || 5,
         offset: (page - 1) * size,
