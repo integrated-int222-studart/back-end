@@ -187,7 +187,7 @@ router.delete('/logoutAll', authUser, async (req, res) => {
 })
 
 router.get('/profile', authUser, (req, res) => {
-    res.send({ user: req.user, token: req.token })
+    res.send({ user: req.user})
 })
 
 router.get('/photo/:id', async (req, res) => {
