@@ -118,6 +118,7 @@ router.post('/register', async(req, res) => {
         if (userWithUsername) res.send('Username has been used!')
         if (userWithEmail) res.send('Email has been used!')
         if (!validator.isEmail(req.body.email)) res.send('Email is invalid')
+        if(!user) res.status(400).send('Please fill out the information')
         if (user) {
             await user.save()
             res.status(201).send("Successful")
