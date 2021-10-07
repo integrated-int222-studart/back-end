@@ -83,6 +83,7 @@ router.get('/productById/:id', async (req, res) => {
             res.status(400).send('Enter variable param')
         }
         const productById = await Product.findOne({
+            
             where: {
                 prodID: id
             },
@@ -94,14 +95,15 @@ router.get('/productById/:id', async (req, res) => {
                 attributes: { exclude: ['productStyles'] }
             },
             {
-                model: Images
+                model: Images,
+                attributes:{exclude: ['data']}
             }, {
                 model: Admin,
                 as: 'adminAppoval',
                 attributes: { exclude: ['password'] },
             }]
         })
-        console.log(productById)
+        // console.log(productById)
         res.send(productById)
     } catch (error) {
         res.status(500).send(error)
