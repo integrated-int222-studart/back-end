@@ -10,64 +10,64 @@ const Admin = require('../models/admin/Admin.model')
 const Image = require('../models/products/images.model')
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
-const {uploadFileUser }= require('../middleware/upload.middleware')
+const { uploadFileUser } = require('../middleware/upload.middleware')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
-router.get('/getAll', async(req, res) => {
+router.get('/getAll', async (req, res) => {
     try {
         const users = await User.findAll({
             as: 'users',
-            attributes: { exclude: ['password','imageData'] },
+            attributes: { exclude: ['password', 'imageData'] },
             include: [{
-                    model: Product,
-                    as: 'products',
-                    // attributes: { exclude: ['ownerID', 'productType'] },
-                    include: [{
-                        model: productType,
-                    }, {
-                        model: Style,
-                        as: 'style'
-                    },
-                    {
-                        model: Image,
-                     attributes: { exclude: ['data'] },
+                model: Product,
+                as: 'products',
+                // attributes: { exclude: ['ownerID', 'productType'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                },
+                {
+                    model: Image,
+                    attributes: { exclude: ['data'] },
 
-                    }, {
-                        model: Admin,
-                        as: 'adminAppoval',
-                        attributes: { exclude: ['password'] },
-                    }],
-                },
-                {
-                    model: Product,
-                    as: 'productFavorite',
-                    // attributes: { exclude: ['favorlite'] },
-                    include: [{
-                        model: productType,
-                    }, {
-                        model: Style,
-                        as: 'style'
-                        
-                        // attributes: { exclude: ['productstyles'] },
-                    }],
-                },
-                {
-                    model: Product,
-                    as: 'productCollection',
-                    // attributes: { exclude: ['ownerID'] },
-                    include: [{
-                        model: productType,
-                    }, {
-                        model: Style,
-                        as: 'style'
-                        // attributes: { exclude: ['productstyles'] },
-                    }],
-                },
+                }, {
+                    model: Admin,
+                    as: 'adminAppoval',
+                    attributes: { exclude: ['password'] },
+                }],
+            },
+            {
+                model: Product,
+                as: 'productFavorite',
+                // attributes: { exclude: ['favorlite'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
 
-                {
-                    model: userToken
-                },
+                    // attributes: { exclude: ['productstyles'] },
+                }],
+            },
+            {
+                model: Product,
+                as: 'productCollection',
+                // attributes: { exclude: ['ownerID'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                    // attributes: { exclude: ['productstyles'] },
+                }],
+            },
+
+            {
+                model: userToken
+            },
             ],
         })
         if (!users) {
@@ -79,7 +79,7 @@ router.get('/getAll', async(req, res) => {
     }
 })
 
-router.get('/tokens', async(req, res) => {
+router.get('/tokens', async (req, res) => {
     try {
         const token = await userToken.findAll()
         if (token) {
@@ -92,7 +92,7 @@ router.get('/tokens', async(req, res) => {
     }
 })
 
-router.post('/register', async(req, res) => {
+router.post('/register', async (req, res) => {
     const checkKeyBody = Object.keys(req.body)
     const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school']
     const isValidKey = checkKeyBody.every((checkKeyBody) => {
@@ -102,7 +102,14 @@ router.post('/register', async(req, res) => {
         res.status(400).send('Invalid key!')
     }
     try {
-        const user = await new User({
+        const userWithEmail = await User.findOne({ where: { email: req.body.email } })
+        const userWithUsername = await User.findOne({ where: { username: req.body.username } })
+        if (userWithUsername) res.send('Username has been used!')
+        if (userWithEmail) res.send('Email has been used!')
+        if (!validator.isEmail(req.body.email)) res.send('Email is invalid')
+
+
+        const user = await User.create({
             username: req.body.username.toLowerCase(),
             email: req.body.email.toLowerCase(),
             password: req.body.password,
@@ -113,22 +120,14 @@ router.post('/register', async(req, res) => {
             school: req.body.school,
         })
 
-        const userWithEmail = await User.findOne({ where: { email: req.body.email } })
-        const userWithUsername = await User.findOne({ where: { username: req.body.username } })
-        if (userWithUsername) res.send('Username has been used!')
-        if (userWithEmail) res.send('Email has been used!')
-        if (!validator.isEmail(req.body.email)) res.send('Email is invalid')
-        if(!user) res.status(400).send('Please fill out the information')
-        if (user) {
-            await user.save()
-            res.status(201).send("Successful")
-        }
+        if (!user) res.status(400).send('Please fill out the information')
+        if (user) res.status(201).send("Successful")
     } catch (error) {
-        res.status(500).send({message: error.message})
+        res.status(500).send({ error: error.message })
     }
 })
 
-router.post('/upload/image',uploadFileUser.single('image'),authUser, async (req, res) =>{
+router.post('/upload/image', uploadFileUser.single('image'), authUser, async (req, res) => {
     if (req.file == undefined) {
         return res.send(`You must select a file.`);
     }
@@ -138,11 +137,11 @@ router.post('/upload/image',uploadFileUser.single('image'),authUser, async (req,
             imageName: req.file.originalname,
             imageURL: `${process.env.IP_API}/user/photo/${req.user.userID}`,
             imageData: fs.readFileSync(
-                process.cwd() + "/src/assets/uploads/user/" + req.file.filename      
-            ) 
-        },{
-            where:{
-            userID: req.user.userID
+                process.cwd() + "/src/assets/uploads/user/" + req.file.filename
+            )
+        }, {
+            where: {
+                userID: req.user.userID
             }
         })
         return res.send(`File has been uploaded.`);
@@ -151,7 +150,7 @@ router.post('/upload/image',uploadFileUser.single('image'),authUser, async (req,
     }
 })
 
-router.post('/login', async(req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         if (!user) {
@@ -169,7 +168,7 @@ router.post('/login', async(req, res) => {
     }
 })
 
-router.delete('/logout', authUser, async(req, res) => {
+router.delete('/logout', authUser, async (req, res) => {
     try {
         await userToken.destroy({ where: { token: req.token }, force: true })
         res.status(200).send('Logout!')
@@ -178,7 +177,7 @@ router.delete('/logout', authUser, async(req, res) => {
     }
 })
 
-router.delete('/logoutAll', authUser, async(req, res) => {
+router.delete('/logoutAll', authUser, async (req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
         res.status(200).send('Logout!')
