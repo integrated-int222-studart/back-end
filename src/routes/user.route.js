@@ -75,17 +75,17 @@ router.get('/getAll', async (req, res) => {
         }
         res.send(users)
     } catch (error) {
-        res.status(404).send({error: error.massage})
+        res.status(404).send({ error: error.massage })
     }
 })
 //be test
 router.get('/tokens', async (req, res) => {
     try {
         const token = await userToken.findAll()
-        if (!token)  return res.status(200).send('No token')
+        if (!token) return res.status(200).send('No token')
         res.status(200).send(token)
     } catch (error) {
-        res.send({error: error.massage})
+        res.send({ error: error.massage })
     }
 })
 
@@ -96,15 +96,17 @@ router.post('/register', async (req, res) => {
         return allowedKey.includes(checkKeyBody)
     })
     if (!isValidKey) {
-       return  res.status(400).send('Invalid key!')
+        return res.status(400).send('Invalid key!')
     }
     try {
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })
         const userWithUsername = await User.findOne({ where: { username: req.body.username } })
-        if (userWithUsername) return res.send('Username has been used!')
-        if (userWithEmail) return res.send('Email has been used!')
         const isEmail = validator.isEmail(req.body.email)
-        if ( isEmail == false) return res.send('Email is invalid')
+        const isStrongPass = validator.isStrongPassword(req.body.password)
+        if (userWithUsername) return res.status(400).send('Username has been used!')
+        if (userWithEmail) return res.status(400).send('Email has been used!')
+        if (isStrongPass == false) return res.status(400).send('Password not strong!')
+        if (isEmail == false) return res.status(400).send('Email is invalid')
 
 
         const user = await User.create({
@@ -122,29 +124,6 @@ router.post('/register', async (req, res) => {
         res.status(201).send("Successful")
     } catch (error) {
         res.status(500).send({ error: error.message })
-    }
-})
-
-router.post('/upload/image', uploadFileUser.single('image'), authUser, async (req, res) => {
-    if (req.file == undefined) {
-        return res.send(`You must select a file.`);
-    }
-    try {
-        await User.update({
-            imageType: req.file.mimetype,
-            imageName: req.file.originalname,
-            imageURL: `${process.env.IP_API}/user/photo/${req.user.userID}`,
-            imageData: fs.readFileSync(
-                process.cwd() + "/src/assets/uploads/user/" + req.file.filename
-            )
-        }, {
-            where: {
-                userID: req.user.userID
-            }
-        })
-        return res.send(`File has been uploaded.`);
-    } catch (error) {
-        res.status(500).send({error: error.massage})
     }
 })
 
@@ -171,7 +150,7 @@ router.delete('/logout', authUser, async (req, res) => {
         await userToken.destroy({ where: { token: req.token }, force: true })
         res.status(200).send('Logout!')
     } catch (error) {
-        res.status(500).send({error: error.massage})
+        res.status(500).send({ error: error.massage })
     }
 })
 
@@ -180,26 +159,45 @@ router.delete('/logoutAll', authUser, async (req, res) => {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
         res.status(200).send('Logout!')
     } catch (error) {
-        res.send({error: error.massage})
+        res.send({ error: error.massage })
     }
 })
 
 router.get('/profile', authUser, (req, res) => {
-    res.send({ user: req.user})
+    res.send({ user: req.user })
 })
-
-router.get('/photo/:id', async (req, res) => {
-    const id = req.params.id
+router.post('/upload/image', uploadFileUser.single('image'), authUser, async (req, res) => {
+    if (req.file == undefined) {
+        return res.send(`You must select a file.`);
+    }
     try {
-        const image = await User.findOne({ where: { userID: id } })
-        if (image) {
-            res.set('Content-Type', image.imageType)
-            res.end(image.imageData)
-        } else {
-            res.send('No image with that id!')
-        }
+        await User.update({
+            imageType: req.file.mimetype,
+            imageName: req.file.originalname,
+            imageURL: `${process.env.IP_API}/user/photo/${req.user.userID}`,
+            imageData: fs.readFileSync(
+                process.cwd() + "/src/assets/uploads/user/" + req.file.filename
+            )
+        }, {
+            where: {
+                userID: req.user.userID
+            }
+        })
+        return res.send(`File has been uploaded.`);
     } catch (error) {
-        res.status(500).send({error: error.massage})
+        res.status(500).send({ error: error.massage })
+    }
+})
+router.get('/photo', authUser, async (req, res) => {
+
+    try {
+        const image = await User.findOne({ where: { userID: req.user.userID } })
+        console.log(image)
+        if (!image) throw new Error()
+        res.set('Content-Type', image.imageType)
+        res.end(image.imageData)
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
     }
 });
 
