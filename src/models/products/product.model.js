@@ -130,4 +130,13 @@ Product.pagination = async(page, size, query) => {
     return pageAndItem
 }
 
+Product.hasProduct = async(productId)=>{
+        const hasProd = await Product.findOne({
+            where:{
+                prodID: productId
+            }
+        })
+        return hasProd
+}
+
 module.exports = Product
