@@ -139,7 +139,7 @@ router.post('/login', async (req, res) => {
             token: token,
         })
         await generateTokenID.save()
-        res.send({ user, token })
+        res.send({token })
     } catch (error) {
         res.status(400).send('Email or Password is wrong!')
     }
