@@ -19,7 +19,7 @@ router.post('/addProduct', authUser, async (req, res) => {
         return allowedKey.includes(checkKeyBody)
     })
     if (!inValidKey) {
-        return await res.status(400).send('Invalid key!')
+        return await res.status(400).send({message:'Invalid key!'})
     }
     try {
         await Product.create({
@@ -37,7 +37,7 @@ router.post('/addProduct', authUser, async (req, res) => {
                     styleID: styleID
                 })
             });
-            res.status(201).send('Product has been created')
+            res.status(201).send({message:'Product has been created'})
         })
     } catch (error) {
         res.status(500).send({error: error.massage})
@@ -48,14 +48,14 @@ router.delete('/deleteProduct/:id',authUser, async (req, res) => {
     try {
         const id = req.params.id
         const hasProduct = await Product.hasProduct(id)
-        if(!hasProduct) return res.status(400).send('No product with that id!')
+        if(!hasProduct) return res.status(400).send({message:'No product with that id!'})
         await Approval.destroy({ where: { prodID: id } })
         await Collection.destroy({ where: { prodID: id } })
         await Favorite.destroy({ where: { prodID: id } })
         await Images.destroy({ where: { prodID: id } })
         await productStyle.destroy({ where: { prodID: id } })
         await Product.destroy({ where: { prodID: id } })
-        res.status(200).send('Product has been removed')
+        res.status(200).send({message:'Product has been removed'})
     } catch (error) {
         res.status(500).send({error: error.massage})
     }
@@ -65,13 +65,13 @@ router.put('/edit/:id',authUser, async(req,res)=>{
     try {
         const id = req.params.id
         const hasProduct = await Product.hasProduct(id)
-        if(!hasProduct) return res.status(400).send('No product with that id!')
+        if(!hasProduct) return res.status(400).send({message:'No product with that id!'})
         await Product.update(req.body,{
             where:{
                 prodID: id
             }
         })
-        res.status(201).send('Edit success!')
+        res.status(201).send({message:'Edit success!'})
     } catch (error) {
         res.status(500).send({error: error.massage})
     }
@@ -81,7 +81,7 @@ router.get('/productById/:id', async (req, res) => {
     try {
         const id = req.params.id
         const hasProduct = await Product.hasProduct(id)
-        if(!hasProduct) return res.status(400).send('No product with that id!')
+        if(!hasProduct) return res.status(400).send({message:'No product with that id!'})
 
         const productById = await Product.findOne({
             where: {
@@ -127,7 +127,7 @@ router.get('/allProduct', async (req, res) => {
                 attributes: { exclude: ['password'] },
             }]
         })
-        if (products === []) res.status(200).send('Product not found!')
+        if (products.length === 0) res.status(200).send({message:'Product not found!'})
         await res.status(200).send(products)
     } catch (error) {
         res.status(500).send({error: error.massage})
@@ -145,7 +145,7 @@ router.get('/product', authUser, async (req, res) => {
         }
 
         )
-        if (product.length === 0) return res.status(200).send('No product')
+        if (product.length === 0) return res.status(200).send({message:'No product'})
         await res.send(product)
     } catch (error) {
         res.status(500).send({error: error.massage})
@@ -165,7 +165,7 @@ router.get('/page', async (req, res) => {
         const size = parseInt(req.body.size) || 5
         const query = req.body.query || ''
         const pages = await Product.pagination(page, size, query)
-        if (pages.length === 0) return res.status(200).send('No product')
+        if (pages.length === 0) return res.status(200).send({message:'No product'})
         res.send(pages)
     } catch (error) {
         res.status(500).send({error: error.massage})
