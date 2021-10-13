@@ -6,7 +6,7 @@ const { authUser } = require('../../middleware/auth.middleware')
 const fs = require('fs');
 router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
     if (req.files == undefined) {
-        return res.send(`You must select a file.`);
+        return res.send({ message: `You must select a file.` });
     }
     try {
         for (i = 0; i < req.files.length; i++) {
@@ -21,16 +21,16 @@ router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
             }).then(result => {
                 Images.update({
                     url: `${process.env.IP_API}/upload/photo/${result.imageID}`
-                },{
-                    where:{
+                }, {
+                    where: {
                         imageID: result.imageID
                     }
                 })
             })
         }
-        res.send(`File has been uploaded.`);
+        res.status(200).send({ message: `File has been uploaded.` });
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send({ error: error.message })
     }
 })
 
@@ -42,10 +42,10 @@ router.get('/photo/:id', authUser, async (req, res) => {
             res.set('Content-Type', image.type)
             res.send(image.data)
         } else {
-            res.send('No image with that id!')
+            res.send({ message: 'No image with that id!' })
         }
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send({ error: error.message })
     }
 });
 

@@ -16,7 +16,7 @@ router.get('/getAll', async(req, res) => {
         }
         res.send(admins)
     } catch (error) {
-        res.status(404).send('Admin only!')
+        res.status(400).send({ message:'Admin only!'})
     }
 })
 
@@ -34,7 +34,7 @@ router.post('/login', async(req, res) => {
         await generateTokenID.save()
         res.send({ admin, token })
     } catch (error) {
-        res.status(400).send('Email or Password is wrong!')
+        res.status(400).send({ message:'Email or Password is wrong!'})
     }
 })
 
@@ -42,9 +42,9 @@ router.post('/login', async(req, res) => {
 router.delete('/logout', authAdmin, async(req, res) => {
     try {
         await adminToken.destroy({ where: { token: req.token }, force: true })
-        res.status(200).send('Logout!')
+        res.status(200).send({ message:'Logout!'})
     } catch (error) {
-        res.send(error)
+        res.status(500).send({error:error.message})
     }
 })
 
@@ -52,14 +52,18 @@ router.delete('/logout', authAdmin, async(req, res) => {
 router.delete('/logoutAll', authAdmin, async(req, res) => {
     try {
         await adminToken.destroy({ where: { adminID: req.admin.adminID }, force: true })
-        res.status(200).send('Logout!')
+        res.status(200).send({ message:'Logout all device!'})
     } catch (error) {
-        res.send(error)
+        res.status(500).send({error:error.message})
     }
 })
 
 router.get('/profile', authAdmin, (req, res) => {
-    res.send({ admin: req.admin, token: req.token })
+    try {
+    res.status(200).send({ admin: req.admin, token: req.token })
+    } catch (error) {
+        res.status(500).send({error:error.message})
+    }
 })
 
 router.get('/tokens', async(req, res) => {
@@ -71,7 +75,7 @@ router.get('/tokens', async(req, res) => {
             res.status(500).send()
         }
     } catch (error) {
-        res.send(error)
+        res.status(500).send({error:error.message})
     }
 })
 

@@ -73,7 +73,7 @@ router.get('/getAll', async (req, res) => {
         if (!users) {
             throw new Error()
         }
-        res.send(users)
+        res.status(200).send(users)
     } catch (error) {
         res.status(404).send({ error: error.massage })
     }
@@ -82,7 +82,7 @@ router.get('/getAll', async (req, res) => {
 router.get('/tokens', async (req, res) => {
     try {
         const token = await userToken.findAll()
-        if (!token) return res.status(200).send('No token')
+        if (!token) return res.status(200).send({ message: 'No token' })
         res.status(200).send(token)
     } catch (error) {
         res.send({ error: error.massage })
@@ -96,17 +96,17 @@ router.post('/register', async (req, res) => {
         return allowedKey.includes(checkKeyBody)
     })
     if (!isValidKey) {
-        return res.status(400).send('Invalid key!')
+        return res.status(400).send({ message: 'Invalid key!' })
     }
     try {
         const userWithEmail = await User.findOne({ where: { email: req.body.email } })
         const userWithUsername = await User.findOne({ where: { username: req.body.username } })
         const isEmail = validator.isEmail(req.body.email)
         const isStrongPass = validator.isStrongPassword(req.body.password)
-        if (userWithUsername) return res.status(400).send('Username has been used!')
-        if (userWithEmail) return res.status(400).send('Email has been used!')
-        if (isStrongPass == false) return res.status(400).send('Password not strong!')
-        if (isEmail == false) return res.status(400).send('Email is invalid')
+        if (userWithUsername) return res.status(400).send({ message: 'Username has been used!' })
+        if (userWithEmail) return res.status(400).send({ message: 'Email has been used!' })
+        if (isStrongPass == false) return res.status(400).send({ message: 'Password not strong!' })
+        if (isEmail == false) return res.status(400).send({ message: 'Email is invalid' })
 
 
         const user = await User.create({
@@ -120,8 +120,8 @@ router.post('/register', async (req, res) => {
             school: req.body.school,
         })
 
-        if (!user) return res.status(400).send('Please fill out the information')
-        res.status(201).send("Successful")
+        if (!user) return res.status(400).send({ message: 'Please fill out the information' })
+        res.status(201).send({ message: "Successful" })
     } catch (error) {
         res.status(500).send({ error: error.message })
     }
@@ -139,16 +139,16 @@ router.post('/login', async (req, res) => {
             token: token,
         })
         await generateTokenID.save()
-        res.send({token })
+        res.send({ token })
     } catch (error) {
-        res.status(400).send('Email or Password is wrong!')
+        res.status(400).send({ message: 'Email or Password is wrong!' })
     }
 })
 
 router.delete('/logout', authUser, async (req, res) => {
     try {
         await userToken.destroy({ where: { token: req.token }, force: true })
-        res.status(200).send('Logout!')
+        res.status(200).send({ message: 'Logout!' })
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
@@ -157,18 +157,37 @@ router.delete('/logout', authUser, async (req, res) => {
 router.delete('/logoutAll', authUser, async (req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
-        res.status(200).send('Logout!')
+        res.status(200).send({ message: 'Logout all device!' })
     } catch (error) {
         res.send({ error: error.massage })
     }
 })
 
+router.get('/profile/:username', async (req, res) => {
+    try {
+        const profile = await User.findOne({
+            where: {
+                username: req.params.username
+
+            },
+            attributes: { exclude: ['imageData'] }
+        })
+        if (!profile) return res.status(400).send({ message: 'Not found username' })
+        res.status(200).send(profile)
+    } catch (error) {
+        res.status(500).send({ error: error.message })
+    }
+})
 router.get('/profile', authUser, (req, res) => {
-    res.send({ user: req.user })
+    try {
+        res.status(200).send({ user: req.user })
+    } catch (error) {
+        res.status(500).send({ error: error.message })
+    }
 })
 router.post('/upload/image', uploadFileUser.single('image'), authUser, async (req, res) => {
     if (req.file == undefined) {
-        return res.send(`You must select a file.`);
+        return res.status(400).send({ message:`You must select a file.`});
     }
     try {
         await User.update({
@@ -183,7 +202,7 @@ router.post('/upload/image', uploadFileUser.single('image'), authUser, async (re
                 userID: req.user.userID
             }
         })
-        return res.send(`File has been uploaded.`);
+        return res.status(200).send({ message:`File has been uploaded.`});
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
