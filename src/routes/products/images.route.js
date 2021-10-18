@@ -4,7 +4,7 @@ const router = new express.Router()
 const { uploadFileProd } = require('../../middleware/upload.middleware')
 const { authUser } = require('../../middleware/auth.middleware')
 const fs = require('fs');
-router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
+router.post('/upload/:prouctId', uploadFileProd.array('image'), async (req, res) => {
     if (req.files == undefined) {
         return res.send({ message: `You must select a file.` });
     }
@@ -12,7 +12,7 @@ router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
         for (i = 0; i < req.files.length; i++) {
             console.log(req.files[i])
             await Images.create({
-                prodID: req.params.id,
+                prodID: req.params.prouctId,
                 type: req.files[i].mimetype,
                 name: req.files[i].originalname,
                 data: fs.readFileSync(
@@ -20,7 +20,7 @@ router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
                 )
             }).then(result => {
                 Images.update({
-                    url: `${process.env.IP_API}/upload/photo/${result.imageID}`
+                    url: `${process.env.IP_API}/image/get/${result.imageID}`
                 }, {
                     where: {
                         imageID: result.imageID
@@ -34,8 +34,8 @@ router.post('/image/:id', uploadFileProd.array('image'), async (req, res) => {
     }
 })
 
-router.get('/photo/:id', authUser, async (req, res) => {
-    const id = req.params.id
+router.get('/get/:imageId', async (req, res) => {
+    const id = req.params.imageId
     try {
         const image = await Images.findOne({ where: { imageID: id } })
         if (image) {

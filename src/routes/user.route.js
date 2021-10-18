@@ -63,12 +63,7 @@ router.get('/getAll', async (req, res) => {
                     as: 'style'
                     // attributes: { exclude: ['productstyles'] },
                 }],
-            },
-
-            {
-                model: userToken
-            },
-            ],
+            }],
         })
         if (!users) {
             throw new Error()
@@ -163,19 +158,66 @@ router.delete('/logoutAll', authUser, async (req, res) => {
     }
 })
 
-router.get('/profile/:username', async (req, res) => {
+router.get('/profileProd/:username', async (req, res) => {
     try {
-        const profile = await User.findOne({
+        const profileWithProd = await User.findOne({
             where: {
                 username: req.params.username
-
             },
-            attributes: { exclude: ['imageData'] }
+            as: 'users',
+            attributes: { exclude: ['password', 'imageData'] },
+            include: [{
+                model: Product,
+                as: 'products',
+                // attributes: { exclude: ['ownerID', 'productType'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                },
+                {
+                    model: Image,
+                    attributes: { exclude: ['data'] },
+
+                }, {
+                    model: Admin,
+                    as: 'adminAppoval',
+                    attributes: { exclude: ['password'] },
+                }],
+            },
+            {
+                model: Product,
+                as: 'productFavorite',
+                // attributes: { exclude: ['favorlite'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+
+                    // attributes: { exclude: ['productstyles'] },
+                }],
+            },
+            {
+                model: Product,
+                as: 'productCollection',
+                // attributes: { exclude: ['ownerID'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                    // attributes: { exclude: ['productstyles'] },
+                }],
+            }],
         })
-        if (!profile) return res.status(400).send({ message: 'Not found username' })
-        res.status(200).send(profile)
+        if (!profileWithProd) {
+            throw new Error()
+        }
+        res.status(200).send(profileWithProd)
     } catch (error) {
-        res.status(500).send({ error: error.message })
+        res.status(404).send({ error: error.massage })
     }
 })
 router.get('/profile', authUser, (req, res) => {
@@ -207,7 +249,7 @@ router.post('/upload/image', uploadFileUser.single('image'), authUser, async (re
         res.status(500).send({ error: error.massage })
     }
 })
-router.get('/photo', authUser, async (req, res) => {
+router.get('/getImage', async (req, res) => {
 
     try {
         const image = await User.findOne({ where: { userID: req.user.userID } })

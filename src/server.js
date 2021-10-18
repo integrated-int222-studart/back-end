@@ -14,7 +14,7 @@ app.use(cors({
 }))
 app.use('/user', userRoute, productRoute, typeRoute, )
 app.use('/product',productRoute)
-app.use('/upload',imageRoute)
+app.use('/image',imageRoute)
 app.use('/admin', adminRoute)
 app.get('/', (req, res) => {
     res.sendFile(__dirname+'/views/index.html')
