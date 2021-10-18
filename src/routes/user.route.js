@@ -100,7 +100,7 @@ router.post('/register', async (req, res) => {
         const isStrongPass = validator.isStrongPassword(req.body.password)
         if (userWithUsername) return res.status(400).send({ message: 'Username has been used!' })
         if (userWithEmail) return res.status(400).send({ message: 'Email has been used!' })
-        if (isStrongPass == false) return res.status(400).send({ message: 'Password not strong!' })
+        // if (isStrongPass == false) return res.status(400).send({ message: 'Password not strong!' })
         if (isEmail == false) return res.status(400).send({ message: 'Email is invalid' })
 
 
@@ -158,64 +158,19 @@ router.delete('/logoutAll', authUser, async (req, res) => {
     }
 })
 
-router.get('/profileProd/:username', async (req, res) => {
+router.get('/profile/:username', async (req, res) => {
     try {
-        const profileWithProd = await User.findOne({
+        const profile= await User.findOne({
             where: {
                 username: req.params.username
             },
             as: 'users',
             attributes: { exclude: ['password', 'imageData'] },
-            include: [{
-                model: Product,
-                as: 'products',
-                // attributes: { exclude: ['ownerID', 'productType'] },
-                include: [{
-                    model: productType,
-                }, {
-                    model: Style,
-                    as: 'style'
-                },
-                {
-                    model: Image,
-                    attributes: { exclude: ['data'] },
-
-                }, {
-                    model: Admin,
-                    as: 'adminAppoval',
-                    attributes: { exclude: ['password'] },
-                }],
-            },
-            {
-                model: Product,
-                as: 'productFavorite',
-                // attributes: { exclude: ['favorlite'] },
-                include: [{
-                    model: productType,
-                }, {
-                    model: Style,
-                    as: 'style'
-
-                    // attributes: { exclude: ['productstyles'] },
-                }],
-            },
-            {
-                model: Product,
-                as: 'productCollection',
-                // attributes: { exclude: ['ownerID'] },
-                include: [{
-                    model: productType,
-                }, {
-                    model: Style,
-                    as: 'style'
-                    // attributes: { exclude: ['productstyles'] },
-                }],
-            }],
         })
-        if (!profileWithProd) {
+        if (!profile) {
             throw new Error()
         }
-        res.status(200).send(profileWithProd)
+        res.status(200).send(profile)
     } catch (error) {
         res.status(404).send({ error: error.massage })
     }

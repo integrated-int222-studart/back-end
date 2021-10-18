@@ -161,6 +161,39 @@ router.get('/prodType', async (req, res) => {
     res.send(type)
 })
 
+router.get('/products/:userId', async(req,res) => {
+    try {
+        const id = req.params.userId
+        const products = await Product.findAll({
+            where:{
+                ownerID: id
+            },
+            include: [{
+                model: productType,
+            }, {
+                model: Style,
+                as: 'style'
+            },
+            {
+                model: Images,
+                attributes: { exclude: ['data'] },
+
+            }, {
+                model: Admin,
+                as: 'adminAppoval',
+                attributes: { exclude: ['password'] },
+            }],
+        })
+        console.log(products)
+        if(!products){
+            throw new Error()
+        }
+        res.status(200).send(products)
+    } catch (error) {
+        res.status(500).send({error: error.massage})
+    }
+})
+
 router.get('/page', async (req, res) => {
     try {
         const page = parseInt(req.body.page) || 1
@@ -174,6 +207,7 @@ router.get('/page', async (req, res) => {
     }
 
 })
+
 
 
 
