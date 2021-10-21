@@ -185,15 +185,15 @@ router.get('/products/:userId', async (req, res) => {
             }],
         })
         
-        const favoriteProd = await Favorite.findAll({ where:{ userID: id }})
+        // const favoriteProd = await Favorite.findAll({ where:{ userID: id }})
 
-        const collectionProd = await Collection.findAll({ where:{userID: id }})
+        // const collectionProd = await Collection.findAll({ where:{userID: id }})
         
-        console.log(favoriteProd)
+        // console.log(favoriteProd)
         if (!products) {
             throw new Error()
         }
-        res.status(200).send({products,favorite:favoriteProd,collection:collectionProd})
+        res.status(200).send(products)
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
