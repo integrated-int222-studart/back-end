@@ -204,11 +204,11 @@ router.post('/upload/image', uploadFileUser.single('image'), authUser, async (re
         res.status(500).send({ error: error.massage })
     }
 })
-router.get('/getImage', async (req, res) => {
+router.get('/getImage/:userId', async (req, res) => {
 
     try {
-        const image = await User.findOne({ where: { userID: req.user.userID } })
-        console.log(image)
+        const image = await User.findOne({ where: { userID: req.params.userId } })
+        // console.log(image)
         if (!image) throw new Error()
         res.set('Content-Type', image.imageType)
         res.end(image.imageData)
