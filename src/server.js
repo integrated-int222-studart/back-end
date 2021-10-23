@@ -8,12 +8,12 @@ const userRoute = require('./routes/user.route')
 const productRoute = require('./routes/products/product.route')
 const typeRoute = require('./routes/products/type.route')
 const imageRoute = require('./routes/products/images.route')
-
+const style = require('./routes/products/style.route')
 app.use(cors({
     origin: process.env.ALLOWED_CORS
 }))
-app.use('/user', userRoute, productRoute, typeRoute, )
-app.use('/product',productRoute)
+app.use('/user', userRoute, productRoute,  )
+app.use('/product',productRoute,typeRoute,style)
 app.use('/image',imageRoute)
 app.use('/admin', adminRoute)
 app.get('/', (req, res) => {
