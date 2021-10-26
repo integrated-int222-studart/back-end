@@ -127,7 +127,7 @@ router.get('/allProduct', async (req, res) => {
                 attributes: { exclude: ['password'] },
             }]
         })
-        console.log(products)
+        // console.log(products)
         if (products.length === 0) return res.status(200).send({ message: 'Product not found!' })
         await res.status(200).send(products)
     } catch (error) {

@@ -10,7 +10,6 @@ router.post('/upload/:prouctId', uploadFileProd.array('image'), async (req, res)
     }
     try {
         for (i = 0; i < req.files.length; i++) {
-            console.log(req.files[i])
             await Images.create({
                 prodID: req.params.prouctId,
                 type: req.files[i].mimetype,
