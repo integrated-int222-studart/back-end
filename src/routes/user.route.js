@@ -230,4 +230,18 @@ router.put('/edit/profile', authUser, async (req, res) => {
     }
 })
 
+router.get('/username/:userId', async(req,res)=>{
+    try {
+        const userID = req.params.userId
+        const username = await User.findOne({
+            where:{
+                userID
+            }
+        })
+        if(!username) return res.send({message:'No username with that id'})
+        res.status(200).send(username)
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
+})
 module.exports = router

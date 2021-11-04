@@ -10,6 +10,7 @@ const Approval = require('../../models/ManyToMany/approval.model')
 const express = require('express')
 const router = new express.Router()
 const { authUser } = require('../../middleware/auth.middleware')
+const User = require('../../models/user/User.model')
 
 
 router.post('/addProduct', authUser, async (req, res) => {
@@ -78,16 +79,16 @@ router.put('/edit/:id', authUser, async (req, res) => {
 })
 
 router.get('/productById/:id', async (req, res) => {
-    try {
+    // try {
         const id = req.params.id
         const hasProduct = await Product.hasProduct(id)
         if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
-
         const productById = await Product.findOne({
             where: {
                 prodID: id
             },
-            include: [{
+            include: [
+                {
                 model: productType,
             }, {
                 model: Style,
@@ -103,10 +104,11 @@ router.get('/productById/:id', async (req, res) => {
                 attributes: { exclude: ['password'] },
             }]
         })
+
         res.status(200).send(productById)
-    } catch (error) {
-        res.status(500).send({ error: error.massage })
-    }
+    // } catch (error) {
+    //     res.status(500).send({ error: error.massage })
+    // }
 })
 router.get('/allProduct', async (req, res) => {
     try {
