@@ -134,7 +134,7 @@ router.post('/login', async (req, res) => {
             token: token,
         })
         await generateTokenID.save()
-        res.send({user,token })
+        res.send({ user, token })
     } catch (error) {
         res.status(400).send({ message: 'Email or Password is wrong!' })
     }
@@ -160,7 +160,7 @@ router.delete('/logoutAll', authUser, async (req, res) => {
 
 router.get('/profile/:username', async (req, res) => {
     try {
-        const profile= await User.findOne({
+        const profile = await User.findOne({
             where: {
                 username: req.params.username
             },
@@ -184,7 +184,7 @@ router.get('/profile', authUser, (req, res) => {
 })
 router.post('/upload/image', uploadFileUser.single('image'), authUser, async (req, res) => {
     if (req.file == undefined) {
-        return res.status(400).send({ message:`You must select a file.`});
+        return res.status(400).send({ message: `You must select a file.` });
     }
     try {
         await User.update({
@@ -199,7 +199,7 @@ router.post('/upload/image', uploadFileUser.single('image'), authUser, async (re
                 userID: req.user.userID
             }
         })
-        return res.status(200).send({ message:`File has been uploaded.`});
+        return res.status(200).send({ message: `File has been uploaded.` });
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
@@ -217,6 +217,17 @@ router.get('/getImage/:userId', async (req, res) => {
     }
 });
 
-
+router.put('/edit/profile', authUser, async (req, res) => {
+    try {
+        await User.update(req.body, {
+            where: {
+                userID: req.user.userID
+            }
+        })
+        res.status(201).send({ message: 'Edit success!' })
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
+})
 
 module.exports = router
