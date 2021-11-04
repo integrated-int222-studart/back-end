@@ -8,12 +8,14 @@ const userRoute = require('./routes/user.route')
 const productRoute = require('./routes/products/product.route')
 const typeRoute = require('./routes/products/type.route')
 const imageRoute = require('./routes/products/images.route')
-const style = require('./routes/products/style.route')
+const styleRoute = require('./routes/products/style.route')
+const favoriteRoute = require('./routes/products/favorite.route')
+const collectionRote = require('./routes/products/collection.route')
 app.use(cors({
     origin: process.env.ALLOWED_CORS
 }))
-app.use('/user', userRoute, productRoute,  )
-app.use('/product',productRoute,typeRoute,style)
+app.use('/user', userRoute, productRoute,favoriteRoute,collectionRote)
+app.use('/product',productRoute,typeRoute,styleRoute)
 app.use('/image',imageRoute)
 app.use('/admin', adminRoute)
 app.get('/', (req, res) => {
