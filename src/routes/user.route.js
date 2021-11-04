@@ -236,7 +236,8 @@ router.get('/username/:userId', async(req,res)=>{
         const username = await User.findOne({
             where:{
                 userID
-            }
+            },
+            attributes: {exclude:["userID","password","email","firstName","lastName","description","status","school","imageData","imageName","imageType","imageURL"]}
         })
         if(!username) return res.send({message:'No username with that id'})
         res.status(200).send(username)

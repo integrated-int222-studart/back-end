@@ -10,7 +10,6 @@ const Approval = require('../../models/ManyToMany/approval.model')
 const express = require('express')
 const router = new express.Router()
 const { authUser } = require('../../middleware/auth.middleware')
-const User = require('../../models/user/User.model')
 
 
 router.post('/addProduct', authUser, async (req, res) => {
