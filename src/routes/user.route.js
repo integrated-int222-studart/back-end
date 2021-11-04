@@ -190,7 +190,7 @@ router.post('/upload/image', uploadFileUser.single('image'), authUser, async (re
         await User.update({
             imageType: req.file.mimetype,
             imageName: req.file.originalname,
-            imageURL: `${process.env.IP_API}/user/photo/${req.user.userID}`,
+            imageURL: `${process.env.IP_API}/user/getImage/${req.user.userID}`,
             imageData: fs.readFileSync(
                 process.cwd() + "/src/assets/uploads/user/" + req.file.filename
             )
