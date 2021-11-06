@@ -2,6 +2,7 @@ const Images = require('../../models/products/images.model')
 const express = require('express')
 const router = new express.Router()
 const { uploadFileProd } = require('../../middleware/upload.middleware')
+var AdmZip = require("adm-zip");
 const { authUser } = require('../../middleware/auth.middleware')
 const fs = require('fs');
 router.post('/upload/:prouctId', uploadFileProd.array('image'), async (req, res) => {
@@ -9,11 +10,12 @@ router.post('/upload/:prouctId', uploadFileProd.array('image'), async (req, res)
         return res.send({ message: `You must select a file.` });
     }
     try {
+        
         for (i = 0; i < req.files.length; i++) {
             await Images.create({
                 prodID: req.params.prouctId,
                 type: req.files[i].mimetype,
-                name: req.files[i].originalname,
+                name: req.files[i].filename,
                 data: fs.readFileSync(
                     process.cwd() + "/src/assets/uploads/product/" + req.files[i].filename
                 )
@@ -47,6 +49,26 @@ router.get('/get/:imageId', async (req, res) => {
         res.status(500).send({ error: error.message })
     }
 });
+
+router.get('/download', async (req, res) => {
+    try {
+        const files = req.body.filename
+        const zip = new AdmZip()
+        if (files) {
+            for (i = 0; i < files.length; i++) {
+                console.log(files[i])
+                zip.addLocalFile('./src/assets/uploads/product/'+files[i])
+            }
+        }
+        const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
+        fs.writeFileSync(outputPath, zip.toBuffer())
+        res.download(outputPath)
+
+    } catch (error) {
+        res.status(500).send({ error: error.message })
+    }
+
+})
 
 
 module.exports = router
