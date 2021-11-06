@@ -22,7 +22,7 @@ router.post('/addProduct', authUser, async (req, res) => {
         return await res.status(400).send({ message: 'Invalid key!' })
     }
     try {
-        await Product.create({
+        const product = await Product.create({
             prodName: req.body.prodName,
             manufacDate: req.body.manufacDate,
             prodDescription: req.body.prodDescription,
@@ -37,7 +37,8 @@ router.post('/addProduct', authUser, async (req, res) => {
                     styleID: styleID
                 })
             });
-            res.status(201).send({ message: 'Product has been created' })
+            // res.status(201).send({ message: 'Product has been created' })
+            res.status(201).send(product)
         })
     } catch (error) {
         res.status(500).send({ error: error.massage })
