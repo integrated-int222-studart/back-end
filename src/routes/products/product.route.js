@@ -29,17 +29,15 @@ router.post('/addProduct', authUser, async (req, res) => {
             price: req.body.price,
             ownerID: req.user.userID,
             productType: req.body.productType,
-        }).then((result) => {
-            const styles = req.body.styleID
-            styles.forEach(styleID => {
-                productStyle.create({
-                    prodID: result.prodID,
-                    styleID: styleID
-                })
-            });
-            // res.status(201).send({ message: 'Product has been created' })
-            res.status(201).send(product)
         })
+        const styles = req.body.styleID
+            styles.forEach(async (styleID) => {
+            await productStyle.create({
+                prodID: product.prodID,
+                styleID: styleID
+            })
+        })
+         res.status(201).send(product)
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
@@ -80,15 +78,15 @@ router.put('/edit/:id', authUser, async (req, res) => {
 
 router.get('/productById/:id', async (req, res) => {
     // try {
-        const id = req.params.id
-        const hasProduct = await Product.hasProduct(id)
-        if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
-        const productById = await Product.findOne({
-            where: {
-                prodID: id
-            },
-            include: [
-                {
+    const id = req.params.id
+    const hasProduct = await Product.hasProduct(id)
+    if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
+    const productById = await Product.findOne({
+        where: {
+            prodID: id
+        },
+        include: [
+            {
                 model: productType,
             }, {
                 model: Style,
@@ -103,9 +101,9 @@ router.get('/productById/:id', async (req, res) => {
                 as: 'adminAppoval',
                 attributes: { exclude: ['password'] },
             }]
-        })
+    })
 
-        res.status(200).send(productById)
+    res.status(200).send(productById)
     // } catch (error) {
     //     res.status(500).send({ error: error.massage })
     // }
@@ -186,11 +184,11 @@ router.get('/products/:userId', async (req, res) => {
                 attributes: { exclude: ['password'] },
             }],
         })
-        
+
         // const favoriteProd = await Favorite.findAll({ where:{ userID: id }})
 
         // const collectionProd = await Collection.findAll({ where:{userID: id }})
-        
+
         // console.log(favoriteProd)
         if (!products) {
             throw new Error()
