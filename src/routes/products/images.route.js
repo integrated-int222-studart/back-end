@@ -5,7 +5,7 @@ const { uploadFileProd } = require('../../middleware/upload.middleware')
 var AdmZip = require("adm-zip");
 const { authUser } = require('../../middleware/auth.middleware')
 const fs = require('fs');
-router.post('/upload/:prouctId', uploadFileProd.array('image'), async (req, res) => {
+router.post('/upload/:prouctId',authUser, uploadFileProd.array('image'), async (req, res) => {
     if (req.files == undefined) {
         return res.send({ message: `You must select a file.` });
     }

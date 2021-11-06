@@ -46,22 +46,24 @@ if (!fs.existsSync(dirUser)) {
 
 const dirProduct = process.cwd() + '/src/assets/uploads/product'
 if (!fs.existsSync(dirProduct)) {
-    const imageDB = (async()=>{
-       const image =  await Images.findAll({
-        })
-            for(i=0;i<image.length;i++){
-                const filename = process.cwd() + "/src/assets/uploads/product/" + image[i].name
-                fs.writeFileSync(filename,image[i].data)
-            }  
-    }) 
-    imageDB()
     fs.mkdirSync(dirProduct, { recursive: true })
 }
 
 const dirZipFile = process.cwd() + '/src/assets/downloads'
-        if (!fs.existsSync(dirZipFile)) {
-            fs.mkdirSync(dirZipFile, { recursive: true })
-        }
+if (!fs.existsSync(dirZipFile)) {
+    fs.mkdirSync(dirZipFile, { recursive: true })
+}
+
+//เพิ่มรูปจาก DB ลงใน server
+const imageDB = (async () => {
+    const image = await Images.findAll({
+    })
+    for (i = 0; i < image.length; i++) {
+        const filename = process.cwd() + "/src/assets/uploads/product/" + image[i].name
+        fs.writeFileSync(filename, image[i].data)
+    }
+})
+imageDB()
 const uploadFileUser = multer({ storage: storageUser, fileFilter: imageFilterUser });
 
 module.exports = { uploadFileProd, uploadFileUser }
