@@ -52,7 +52,7 @@ router.get('/get/:imageId', async (req, res) => {
     }
 });
 
-router.get('/download/:prodId', async (req, res) => {
+router.get('/download/:prodId', authUser, async (req, res) => {
     try {
         const prodID = req.params.prodId
         console.log(prodID)
@@ -71,6 +71,7 @@ router.get('/download/:prodId', async (req, res) => {
         });
         // console.log(arrImage)
         const zip = new AdmZip()
+        if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
         if (arrImage) {
             for (i = 0; i < arrImage.length; i++) {
                 zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
