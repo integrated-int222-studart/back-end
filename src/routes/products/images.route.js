@@ -1,16 +1,18 @@
 const Images = require('../../models/products/images.model')
 const express = require('express')
 const router = new express.Router()
+const Product = require('../../models/products/product.model')
+const User = require('../../models/user/User.model')
 const { uploadFileProd } = require('../../middleware/upload.middleware')
 var AdmZip = require("adm-zip");
 const { authUser } = require('../../middleware/auth.middleware')
 const fs = require('fs');
-router.post('/upload/:prouctId',authUser, uploadFileProd.array('image'), async (req, res) => {
+router.post('/upload/:prouctId', authUser, uploadFileProd.array('image'), async (req, res) => {
     if (req.files == undefined) {
         return res.send({ message: `You must select a file.` });
     }
     try {
-        
+
         for (i = 0; i < req.files.length; i++) {
             await Images.create({
                 prodID: req.params.prouctId,
@@ -50,14 +52,28 @@ router.get('/get/:imageId', async (req, res) => {
     }
 });
 
-router.get('/download', async (req, res) => {
+router.get('/download/:prodId', async (req, res) => {
     try {
-        const files = req.body.filename
+        const prodID = req.params.prodId
+        console.log(prodID)
+        const product = await Product.findOne({
+            where: {
+                prodID
+            },
+            include: [{
+                model: Images,
+                attributes: { exclude: ['data'] }
+            }]
+        })
+        let arrImage = []
+        product.images.forEach(element => {
+            arrImage.push(element.name)
+        });
+        // console.log(arrImage)
         const zip = new AdmZip()
-        if (files) {
-            for (i = 0; i < files.length; i++) {
-                console.log(files[i])
-                zip.addLocalFile('./src/assets/uploads/product/'+files[i])
+        if (arrImage) {
+            for (i = 0; i < arrImage.length; i++) {
+                zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
             }
         }
         const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'

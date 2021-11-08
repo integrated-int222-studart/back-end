@@ -26,7 +26,7 @@ router.get('/collection/:userId', async (req, res) => {
         const userID = req.params.userId
         const collectionUser = await User.findOne({
             as: 'users',
-            attributes: {exclude:["userID","username","password","email","firstName","lastName","description","status","school","imageData","imageName","imageType","imageURL"]},
+            attributes: {exclude:["userID","password","email","firstName","lastName","description","status","school","imageData","imageName","imageType","imageURL"]},
             where: {
                 userID
             },
@@ -36,12 +36,7 @@ router.get('/collection/:userId', async (req, res) => {
                 include: [{
                     model: Image,
                     attributes: { exclude: ['data'] }
-                }, {
-                    model: productType,
-                }, {
-                    model: Style,
-                    as: 'style'
-                },]
+                }]
             }]
         })
         if (collectionUser.length === 0) return res.status(200).send({ message: 'No collecion' })
