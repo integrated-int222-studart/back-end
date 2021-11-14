@@ -84,7 +84,7 @@ User.findByCredentials = async(email, password) => {
         throw new Error()
     }
     const userNotPass = await User.findOne({
-        where: { email: email },
+        where: { email },
         attributes: { exclude: ['password','imageData'] }
     })
     return userNotPass

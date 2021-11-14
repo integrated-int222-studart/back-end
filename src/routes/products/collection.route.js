@@ -15,7 +15,7 @@ router.post('/addCollection/:prodId', authUser, async (req, res) => {
             userID: req.user.userID,
             purchaseDate: req.body.purchaseDate
         })
-        res.status(201).send('Added to collection')
+        res.status(201).send({message:'Added to collection'})
     } catch (error) {
         res.status(500).send({ error: error.message })
     }

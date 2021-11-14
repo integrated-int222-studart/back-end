@@ -55,7 +55,6 @@ router.get('/get/:imageId', async (req, res) => {
 router.get('/download/:prodId', authUser, async (req, res) => {
     try {
         const prodID = req.params.prodId
-        console.log(prodID)
         const product = await Product.findOne({
             where: {
                 prodID
@@ -69,7 +68,6 @@ router.get('/download/:prodId', authUser, async (req, res) => {
         product.images.forEach(element => {
             arrImage.push(element.name)
         });
-        // console.log(arrImage)
         const zip = new AdmZip()
         if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
         if (arrImage) {

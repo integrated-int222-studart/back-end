@@ -29,6 +29,7 @@ router.post('/addProduct', authUser, async (req, res) => {
             price: req.body.price,
             ownerID: req.user.userID,
             productType: req.body.productType,
+            status: 0
         })
         const styles = req.body.styleID
             styles.forEach(async (styleID) => {
@@ -37,6 +38,13 @@ router.post('/addProduct', authUser, async (req, res) => {
                 styleID: styleID
             })
         })
+
+        const appoveAdmin = await Approval.create({
+            adminID: null,
+            prodID: product.prodID,
+            status: 0
+        })
+            // console.log(appoveAdmin)
          res.status(201).send(product)
     } catch (error) {
         res.status(500).send({ error: error.massage })
@@ -47,13 +55,24 @@ router.delete('/deleteProduct/:id', authUser, async (req, res) => {
     try {
         const id = req.params.id
         const hasProduct = await Product.hasProduct(id)
+        
         if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
-        await Approval.destroy({ where: { prodID: id } })
-        await Collection.destroy({ where: { prodID: id } })
-        await Favorite.destroy({ where: { prodID: id } })
-        await Images.destroy({ where: { prodID: id } })
-        await productStyle.destroy({ where: { prodID: id } })
-        await Product.destroy({ where: { prodID: id } })
+
+      const collection =  await Collection.findOne({ where: { prodID: id } })
+        if(collection){
+            await Product.update({status:0},{
+                where:{
+                    prodID: id
+                }
+            })
+        }else{
+            await Approval.destroy({ where: { prodID: id } })
+            await Favorite.destroy({ where: { prodID: id } })
+            await Images.destroy({ where: { prodID: id } })
+            await productStyle.destroy({ where: { prodID: id } })
+            await Product.destroy({ where: { prodID: id } })
+        }
+       
         res.status(200).send({ message: 'Product has been removed' })
     } catch (error) {
         res.status(500).send({ error: error.massage })

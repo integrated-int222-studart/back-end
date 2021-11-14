@@ -3,13 +3,19 @@ const sequelize = require('../../database/sequelize')
 const Admin = require('../admin/Admin.model')
 const Product = require('../products/product.model')
 const Approval = sequelize.define('approval', {
+    approvalID: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false
+    },
     adminID: {
         type: DataTypes.INTEGER,
         references: {
             model: Admin,
-            key: 'adminID'
+            key: 'adminID',
         },
-        allowNull: false
+        
     },
     prodID: {
         type: DataTypes.INTEGER,
@@ -21,10 +27,10 @@ const Approval = sequelize.define('approval', {
     },
     approveDate: {
         type: DataTypes.DATE,
-        allowNull: false
+        allowNull: true
     },
     status: {
-        type: DataTypes.STRING(30),
+        type: DataTypes.TINYINT,
         allowNull: false
     }
 }, {

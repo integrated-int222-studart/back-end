@@ -21,7 +21,7 @@ router.get('/getAll', async(req, res) => {
 })
 
 router.post('/login', async(req, res) => {
-    try {
+    // try {
         const admin = await Admin.findByCredentials(req.body.email, req.body.password)
         if (!admin) {
             throw new Error()
@@ -33,9 +33,9 @@ router.post('/login', async(req, res) => {
         })
         await generateTokenID.save()
         res.send({ admin, token })
-    } catch (error) {
-        res.status(400).send({ message:'Email or Password is wrong!'})
-    }
+    // } catch (error) {
+    //     res.status(400).send({ message:'Email or Password is wrong!'})
+    // }
 })
 
 //logout one session 

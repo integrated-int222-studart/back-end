@@ -31,6 +31,10 @@ const Product = sequelize.define('products', {
     price: {
         type: DataTypes.DOUBLE,
         allowNull: false
+    },
+    status:{
+        type: DataTypes.TINYINT,
+        allowNull: false
     }
 }, {
     timestamps: false
@@ -110,6 +114,8 @@ Product.belongsToMany(Admin, {
     timestamps: false,
     foreignKey: 'prodID'
 })
+
+
 
 //Product -->> Images
 Product.hasMany(Images, {
