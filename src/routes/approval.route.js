@@ -10,7 +10,7 @@ router.get('/getApproval', authAdmin ,async (req, res) => {
         const productWithApprove = await Product.findAll({
             include: [{
                 model: Admin,
-                as: 'adminAppoval',
+                as: 'adminApproval',
                 attributes: { exclude: ['password'] },
             }, {
                 model: Image,

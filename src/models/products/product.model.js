@@ -110,7 +110,7 @@ Admin.belongsToMany(Product, {
 })
 Product.belongsToMany(Admin, {
     through: Appoval,
-    as: 'adminAppoval',
+    as: 'adminApproval',
     timestamps: false,
     foreignKey: 'prodID'
 })

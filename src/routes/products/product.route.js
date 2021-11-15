@@ -117,7 +117,7 @@ router.get('/productById/:id', async (req, res) => {
                 attributes: { exclude: ['data'] }
             }, {
                 model: Admin,
-                as: 'adminAppoval',
+                as: 'adminApproval',
                 attributes: { exclude: ['password'] },
             }]
     })
@@ -142,7 +142,7 @@ router.get('/allProduct', async (req, res) => {
                 attributes: { exclude: ['data'] }
             }, {
                 model: Admin,
-                as: 'adminAppoval',
+                as: 'adminApproval',
                 attributes: { exclude: ['password'] },
             }]
         })
@@ -199,7 +199,7 @@ router.get('/products/:userId', async (req, res) => {
 
             }, {
                 model: Admin,
-                as: 'adminAppoval',
+                as: 'adminApproval',
                 attributes: { exclude: ['password'] },
             }],
         })

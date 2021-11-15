@@ -35,7 +35,7 @@ router.get('/getAll', async (req, res) => {
 
                 }, {
                     model: Admin,
-                    as: 'adminAppoval',
+                    as: 'adminApproval',
                     attributes: { exclude: ['password'] },
                 }],
             },
