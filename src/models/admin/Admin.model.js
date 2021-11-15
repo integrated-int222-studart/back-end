@@ -47,7 +47,7 @@ Admin.findByCredentials = async (email, password) => {
 
 // Hash the plain text password manual
 // const encryptPassword = async () => {
-//     const adminPass = 'admin'
+//     const adminPass = 'admin9999'
 //     const salt = await bcrypt.genSalt(8)
 //     const password = await bcrypt.hash(adminPass, salt)
 //     console.log(password)
