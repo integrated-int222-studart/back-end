@@ -24,6 +24,18 @@ router.get('/getApproval', authAdmin ,async (req, res) => {
     }
 })
 
+router.get('/approveStatus', authAdmin, async(req,res)=>{
+    try {
+        const status = await Approval.findAll({
+            attributes: {exclude: ['approvalID','adminID','approveDate']}
+        })
+        if(!status) return res.send({message:'No status'})
+        res.status(200).send(status)
+    } catch (error) {
+        res.status(500).send({ error: error.message })
+    }
+})
+
 router.put('/approveProduct/:prodId', authAdmin, async (req, res) => {
     try {
         const prodID = parseInt(req.params.prodId) 
@@ -59,5 +71,6 @@ router.put('/approveProduct/:prodId', authAdmin, async (req, res) => {
         res.status(500).send({ error: error.message })
     }
 })
+
 
 module.exports = router
