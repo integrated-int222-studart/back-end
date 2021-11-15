@@ -66,7 +66,7 @@ router.get('/profile', authAdmin, (req, res) => {
     }
 })
 
-router.get('/tokens', async(req, res) => {
+router.get('/tokens', authAdmin , async(req, res) => {
     try {
         const token = await adminToken.findAll()
         if (token) {

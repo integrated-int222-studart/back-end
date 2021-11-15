@@ -4,13 +4,18 @@ const { authAdmin } = require('../middleware/auth.middleware')
 const Approval = require('../models/ManyToMany/approval.model')
 const Product = require('../models/products/product.model')
 const Admin = require('../models/admin/Admin.model')
-router.get('/getApproval', async (req, res) => {
+const Image = require('../models/products/images.model')
+router.get('/getApproval', authAdmin ,async (req, res) => {
     try {
         const productWithApprove = await Product.findAll({
             include: [{
                 model: Admin,
                 as: 'adminAppoval',
                 attributes: { exclude: ['password'] },
+            }, {
+                model: Image,
+                attributes: { exclude: ['data'] },
+
             }],
         })
         res.status(200).send(productWithApprove)
