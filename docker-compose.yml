@@ -1,7 +1,7 @@
 version: "3"
 services:
   backend:
-    image: ghcr.io/integrated-int222-studart/back-end:dev
+    image: ghcr.io/integrated-int222-studart/back-end:master
     container_name: studart-backend
     environment:
       - CONECTION=${CONECTION}
