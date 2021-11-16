@@ -10,99 +10,101 @@ const Admin = require('../models/admin/Admin.model')
 const Image = require('../models/products/images.model')
 const jwt = require('jsonwebtoken')
 const fs = require('fs')
-const {uploadFileUser }= require('../middleware/upload.middleware')
+const { uploadFileUser } = require('../middleware/upload.middleware')
 const { authUser } = require('../middleware/auth.middleware')
 require('dotenv').config()
 
-router.get('/getAll', async(req, res) => {
+router.get('/getAll', async (req, res) => {
     try {
         const users = await User.findAll({
             as: 'users',
-            attributes: { exclude: ['password','imageData'] },
+            attributes: { exclude: ['password', 'imageData'] },
             include: [{
-                    model: Product,
-                    as: 'products',
-                    // attributes: { exclude: ['ownerID', 'productType'] },
-                    include: [{
-                        model: productType,
-                    }, {
-                        model: Style,
-                        as: 'style'
-                    },
-                    {
-                        model: Image,
-                     attributes: { exclude: ['data'] },
+                model: Product,
+                as: 'products',
+                // attributes: { exclude: ['ownerID', 'productType'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                },
+                {
+                    model: Image,
+                    attributes: { exclude: ['data'] },
 
-                    }, {
-                        model: Admin,
-                        as: 'adminAppoval',
-                        attributes: { exclude: ['password'] },
-                    }],
-                },
-                {
-                    model: Product,
-                    as: 'productFavorite',
-                    // attributes: { exclude: ['favorlite'] },
-                    include: [{
-                        model: productType,
-                    }, {
-                        model: Style,
-                        as: 'style'
-                        
-                        // attributes: { exclude: ['productstyles'] },
-                    }],
-                },
-                {
-                    model: Product,
-                    as: 'productCollection',
-                    // attributes: { exclude: ['ownerID'] },
-                    include: [{
-                        model: productType,
-                    }, {
-                        model: Style,
-                        as: 'style'
-                        // attributes: { exclude: ['productstyles'] },
-                    }],
-                },
+                }, {
+                    model: Admin,
+                    as: 'adminApproval',
+                    attributes: { exclude: ['password'] },
+                }],
+            },
+            {
+                model: Product,
+                as: 'productFavorite',
+                // attributes: { exclude: ['favorlite'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
 
-                {
-                    model: userToken
-                },
-            ],
+                    // attributes: { exclude: ['productstyles'] },
+                }],
+            },
+            {
+                model: Product,
+                as: 'productCollection',
+                // attributes: { exclude: ['ownerID'] },
+                include: [{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                    // attributes: { exclude: ['productstyles'] },
+                }],
+            }],
         })
         if (!users) {
             throw new Error()
         }
-        res.send(users)
+        res.status(200).send(users)
     } catch (error) {
-        res.status(404).send(error)
+        res.status(404).send({ error: error.massage })
     }
 })
-
-router.get('/tokens', async(req, res) => {
+//be test
+router.get('/tokens', async (req, res) => {
     try {
         const token = await userToken.findAll()
-        if (token) {
-            res.send(token)
-        } else {
-            res.status(500).send()
-        }
+        if (!token) return res.status(200).send({ message: 'No token' })
+        res.status(200).send(token)
     } catch (error) {
-        res.send(error)
+        res.send({ error: error.massage })
     }
 })
 
-router.post('/register', async(req, res) => {
+router.post('/register', async (req, res) => {
     const checkKeyBody = Object.keys(req.body)
     const allowedKey = ['username', 'email', 'password', 'status', 'firstName', 'lastName', 'description', 'school']
     const isValidKey = checkKeyBody.every((checkKeyBody) => {
         return allowedKey.includes(checkKeyBody)
     })
     if (!isValidKey) {
-        res.status(500).send('Invalid key!')
+        return res.status(400).send({ message: 'Invalid key!' })
     }
     try {
-        const user = await new User({
+        const userWithEmail = await User.findOne({ where: { email: req.body.email } })
+        const userWithUsername = await User.findOne({ where: { username: req.body.username } })
+        const isEmail = validator.isEmail(req.body.email)
+        const isStrongPass = validator.isStrongPassword(req.body.password)
+        if (userWithUsername) return res.status(400).send({ message: 'Username has been used!' })
+        if (userWithEmail) return res.status(400).send({ message: 'Email has been used!' })
+        // if (isStrongPass == false) return res.status(400).send({ message: 'Password not strong!' })
+        if (isEmail == false) return res.status(400).send({ message: 'Email is invalid' })
+
+
+        const user = await User.create({
             username: req.body.username.toLowerCase(),
             email: req.body.email.toLowerCase(),
             password: req.body.password,
@@ -111,46 +113,16 @@ router.post('/register', async(req, res) => {
             lastName: req.body.lastName,
             description: req.body.description,
             school: req.body.school,
-            // image: req.body.image
         })
 
-        const userWithEmail = await User.findOne({ where: { email: req.body.email } })
-        const userWithUsername = await User.findOne({ where: { username: req.body.username } })
-        if (userWithUsername) res.send('Username has been used!')
-        if (userWithEmail) res.send('Email has been used!')
-        if (!validator.isEmail(req.body.email)) res.send('Email is invalid')
-        if (user) {
-            await user.save()
-            res.status(201).send("Successful")
-        }
+        if (!user) return res.status(400).send({ message: 'Please fill out the information' })
+        res.status(201).send({ message: "Successful" })
     } catch (error) {
-        res.status(400).send(error)
+        res.status(500).send({ error: error.message })
     }
 })
 
-router.post('/upload/image/:id',uploadFileUser.single('image'),authUser, async (req, res) =>{
-    if (req.file == undefined) {
-        return res.send(`You must select a file.`);
-    }
-    try {
-        await User.update({
-            imageType: req.file.mimetype,
-            imageName: req.file.originalname,
-            imageData: fs.readFileSync(
-                process.cwd() + "/src/assets/uploads/user/" + req.file.filename      
-            ) 
-        },{
-            where:{
-            userID: req.params.id
-            }
-        })
-        return res.send(`File has been uploaded.`);
-    } catch (error) {
-        res.status(500).send(error)
-    }
-})
-
-router.post('/login', async(req, res) => {
+router.post('/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         if (!user) {
@@ -164,47 +136,113 @@ router.post('/login', async(req, res) => {
         await generateTokenID.save()
         res.send({ user, token })
     } catch (error) {
-        res.status(400).send('Email or Password is wrong!')
+        res.status(400).send({ message: 'Email or Password is wrong!' })
     }
 })
 
-router.delete('/logout', authUser, async(req, res) => {
+router.delete('/logout', authUser, async (req, res) => {
     try {
         await userToken.destroy({ where: { token: req.token }, force: true })
-        res.status(200).send('Logout!')
+        res.status(200).send({ message: 'Logout!' })
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send({ error: error.massage })
     }
 })
 
-router.delete('/logoutAll', authUser, async(req, res) => {
+router.delete('/logoutAll', authUser, async (req, res) => {
     try {
         await userToken.destroy({ where: { userID: req.user.userID }, force: true })
-        res.status(200).send('Logout!')
+        res.status(200).send({ message: 'Logout all device!' })
     } catch (error) {
-        res.send(error)
+        res.send({ error: error.massage })
     }
 })
 
-router.get('/profile', authUser, (req, res) => {
-    res.send({ user: req.user, token: req.token })
-})
-
-router.get('/photo/:id', async (req, res) => {
-    const id = req.params.id
+router.get('/profile/:username', async (req, res) => {
     try {
-        const image = await User.findOne({ where: { userID: id } })
-        if (image) {
-            res.set('Content-Type', image.imageType)
-            res.end(image.imageData)
-        } else {
-            res.send('No image with that id!')
+        const profile = await User.findOne({
+            where: {
+                username: req.params.username
+            },
+            as: 'users',
+            attributes: { exclude: ['password', 'imageData'] },
+        })
+        if (!profile) {
+            throw new Error()
         }
+        res.status(200).send(profile)
     } catch (error) {
-        res.status(500).send(error)
+        res.status(404).send({ error: error.massage })
+    }
+})
+router.get('/profile', authUser, (req, res) => {
+    try {
+        res.status(200).send({ user: req.user })
+    } catch (error) {
+        res.status(500).send({ error: error.message })
+    }
+})
+router.post('/upload/image', uploadFileUser.single('image'), authUser, async (req, res) => {
+    if (req.file == undefined) {
+        return res.status(400).send({ message: `You must select a file.` });
+    }
+    try {
+        await User.update({
+            imageType: req.file.mimetype,
+            imageName: req.file.originalname,
+            imageURL: `${process.env.IP_API}/user/getImage/${req.user.userID}`,
+            imageData: fs.readFileSync(
+                process.cwd() + "/src/assets/uploads/user/" + req.file.filename
+            )
+        }, {
+            where: {
+                userID: req.user.userID
+            }
+        })
+        return res.status(200).send({ message: `File has been uploaded.` });
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
+})
+router.get('/getImage/:userId', async (req, res) => {
+
+    try {
+        const image = await User.findOne({ where: { userID: req.params.userId } })
+        // console.log(image)
+        if (!image) throw new Error()
+        res.set('Content-Type', image.imageType)
+        res.end(image.imageData)
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
     }
 });
 
+router.put('/edit/profile', authUser, async (req, res) => {
+    try {
+        await User.update(req.body, {
+            where: {
+                userID: req.user.userID
+            }
+        })
+        res.status(201).send({ message: 'Edit success!' })
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
+})
 
-
+router.get('/username/:userId', async(req,res)=>{
+    try {
+        const userID = req.params.userId
+        const username = await User.findOne({
+            where:{
+                userID
+            },
+            attributes: {exclude:["userID","password","email","firstName","lastName","description","status","school","imageData","imageName","imageType","imageURL"]}
+        })
+        if(!username) return res.send({message:'No username with that id'})
+        res.status(200).send(username)
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
+})
 module.exports = router

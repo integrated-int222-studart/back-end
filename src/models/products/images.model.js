@@ -19,7 +19,11 @@ const Images = sequelize.define('images', {
     type:{
         type: DataTypes.STRING(45),
         allowNull: false
-    }
+    },
+    url:{
+        type: DataTypes.STRING(45),
+        allowNull: true
+    },
 
 }, {
     timestamps: false

@@ -1,17 +1,33 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Node js Express Multiple Image Upload using Multer Example - ItSolutionStuff.com</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <h1>Node js Express Multiple Image Upload using Multer Example - ItSolutionStuff.com</h1>
+    <form action="/upload/image/3" enctype="multipart/form-data" method="post">
+      <input type="file" name="image" accept='image/*' multiple>
+      <input type="submit" value="Upload">
+    </form>  
+  </body> -->
+<!-- </html> -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Node.js upload images</title>
-    <link
-      rel="stylesheet"
-      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    />
+    <title>Node.js upload multiple files</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
     <style>
       div.preview-images > img {
         width: 30%;
+        height: 40%;
+        border: 20px, solid ,black ;
+       
       }
     </style>
   </head>
@@ -19,21 +35,12 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-8 mt-3">
-          <h4>Node.js upload images - bezkoder.com</h4>
+          <h4>Node.js upload multiple files - bezkoder.com</h4>
 
-          <form
-            class="mt-4"
-            action="/upload/image/46"
-            method="POST"
-            enctype="multipart/form-data"
-          >
+          <form action="/multiple-upload" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-              <input
-                type="file"
-                name="image"
-                id="input-files"
-                class="form-control-file border"
-              />
+              <label for="example-input-file"> </label>
+              <input type="file" name="multi-files" multiple id="input-multi-files" class="form-control-file border"/>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
@@ -45,6 +52,13 @@
           <div class="preview-images"></div>
         </div>
       </div>
+      <div>
+        <h1>Download Image</h1>
+        <a href="http://localhost:3000/image/download" download>
+          <img src="https://pbs.twimg.com/profile_images/1180137845614268416/V1zvs4ts.jpg" alt="doraemon" >
+        </a>
+      </div>
+      
     </div>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -64,7 +78,7 @@
             }
           }
         };
-        $("#input-files").on("change", function() {
+        $("#input-multi-files").on("change", function() {
           imagesPreview(this, "div.preview-images");
         });
       });

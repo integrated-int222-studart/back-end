@@ -28,8 +28,13 @@ Admin.hasMany(adminToken, {
 })
 
 //Checking email and password for login
-Admin.findByCredentials = async(email, password) => {
-    const admin = await Admin.findOne({ where: { email: email } })
+Admin.findByCredentials = async (email, password) => {
+
+    const admin = await Admin.findOne({
+            where: { email },
+            // attributes: { exclude: ['password'] },
+        }
+    )
     if (!admin) {
         throw new Error('Unable to login')
     }
@@ -41,8 +46,8 @@ Admin.findByCredentials = async(email, password) => {
 }
 
 // Hash the plain text password manual
-// const encryptPassword = async() => {
-//     const adminPass = 'admin'
+// const encryptPassword = async () => {
+//     const adminPass = 'admin9999'
 //     const salt = await bcrypt.genSalt(8)
 //     const password = await bcrypt.hash(adminPass, salt)
 //     console.log(password)

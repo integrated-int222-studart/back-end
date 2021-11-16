@@ -31,6 +31,10 @@ const Product = sequelize.define('products', {
     price: {
         type: DataTypes.DOUBLE,
         allowNull: false
+    },
+    status:{
+        type: DataTypes.TINYINT,
+        allowNull: false
     }
 }, {
     timestamps: false
@@ -106,10 +110,12 @@ Admin.belongsToMany(Product, {
 })
 Product.belongsToMany(Admin, {
     through: Appoval,
-    as: 'adminAppoval',
+    as: 'adminApproval',
     timestamps: false,
     foreignKey: 'prodID'
 })
+
+
 
 //Product -->> Images
 Product.hasMany(Images, {
@@ -117,7 +123,7 @@ Product.hasMany(Images, {
 })
 
 //paging
-Product.Pagination = async(page, size, query) => {
+Product.pagination = async(page, size, query) => {
     const pageAndItem = await Product.findAll({
         limit: size || 5,
         offset: (page - 1) * size,
@@ -128,6 +134,15 @@ Product.Pagination = async(page, size, query) => {
         }
     })
     return pageAndItem
+}
+
+Product.hasProduct = async(productId)=>{
+        const hasProd = await Product.findOne({
+            where:{
+                prodID: productId
+            }
+        })
+        return hasProd
 }
 
 module.exports = Product

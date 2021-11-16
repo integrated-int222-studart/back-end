@@ -56,6 +56,10 @@ const User = sequelize.define('users', {
     imageType:{
         type: DataTypes.STRING(45),
         allowNull: true
+    },
+    imageURL:{
+        type: DataTypes.STRING(45),
+        allowNull: true
     }
 
 }, {
@@ -80,8 +84,8 @@ User.findByCredentials = async(email, password) => {
         throw new Error()
     }
     const userNotPass = await User.findOne({
-        where: { email: email },
-        attributes: { exclude: ['password'] }
+        where: { email },
+        attributes: { exclude: ['password','imageData'] }
     })
     return userNotPass
 }

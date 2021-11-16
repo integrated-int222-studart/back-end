@@ -30,14 +30,6 @@ router.get('/allType', async(req, res) => {
     res.send(types)
 })
 
-router.get('/typeProd', async(req, res) => {
-    const typeProd = await productType.findAll({
-        include: {
-            model: Product
-        }
-    })
-    res.send(typeProd)
-})
 
 router.get('/typeProd', async(req, res) => {
     try {
