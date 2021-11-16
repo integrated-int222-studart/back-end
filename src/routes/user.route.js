@@ -208,7 +208,6 @@ router.get('/getImage/:userId', async (req, res) => {
 
     try {
         const image = await User.findOne({ where: { userID: req.params.userId } })
-        // console.log(image)
         if (!image) throw new Error()
         res.set('Content-Type', image.imageType)
         res.end(image.imageData)

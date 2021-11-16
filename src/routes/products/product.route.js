@@ -33,19 +33,16 @@ router.post('/addProduct', authUser, async (req, res) => {
             status: 0
         })
         const styles = req.body.styleID
-        styles.forEach(async (styleID) => {
-            await productStyle.create({
-                prodID: product.prodID,
-                styleID: styleID
-            })
-        })
-
-        const appoveAdmin = await Approval.create({
+        let data = []
+        for (let i = 0; i < styles.length; i++) {
+            data.push({ prodID: product.prodID, styleID: styles[i] })
+        }
+        await productStyle.bulkCreate(data)
+        await Approval.create({
             adminID: null,
             prodID: product.prodID,
             status: 0
         })
-        // console.log(appoveAdmin)
         res.status(201).send(product)
     } catch (error) {
         res.status(500).send({ error: error.massage })
@@ -147,7 +144,6 @@ router.get('/allProduct', async (req, res) => {
                 attributes: { exclude: ['password'] },
             }]
         })
-        // console.log(products)
         if (products.length === 0) return res.status(200).send({ message: 'Product not found!' })
         await res.status(200).send(products)
     } catch (error) {
@@ -209,7 +205,6 @@ router.get('/products/:userId', async (req, res) => {
 
         // const collectionProd = await Collection.findAll({ where:{userID: id }})
 
-        // console.log(favoriteProd)
         if (!products) {
             throw new Error()
         }

@@ -26,7 +26,6 @@ router.put('/editStyle/:prodId', async (req, res) => {
         for (let i = 0; i < stylesID.length; i++) {
             data.push({ prodID, styleID: stylesID[i] })
         }
-        console.log(data)
         await productStyle.bulkCreate(data)
 
         const productWithStyle = await Product.findOne({
