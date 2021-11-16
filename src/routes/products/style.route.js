@@ -2,6 +2,7 @@ const express = require('express')
 const router = new express.Router()
 const Style = require('../../models/products/style.model')
 const productStyle = require('../../models/ManyToMany/productStyles.model')
+const Product = require('../../models/products/product.model')
 router.get('/allStyle', async (req, res) => {
     try {
         const style = await Style.findAll()
@@ -21,14 +22,24 @@ router.put('/editStyle/:prodId', async (req, res) => {
                 prodID
             }
         })
-        stylesID.forEach(async styleID => {
-            await productStyle.create({
-                prodID: prodID,
-                styleID
-            })
-        });
-    res.status(201).send({message:'product style updated'})
-        
+        let data = []
+        for (let i = 0; i < stylesID.length; i++) {
+            data.push({ prodID, styleID: stylesID[i] })
+        }
+        console.log(data)
+        await productStyle.bulkCreate(data)
+
+        const productWithStyle = await Product.findOne({
+            where: {
+                prodID
+            },
+            include: [{
+                model: Style,
+                as: 'style',
+                attributes: { exclude: ['productStyles'] }
+            },]
+        })
+        res.status(201).send(productWithStyle)
     } catch (error) {
         res.status(500).send({ error: error.message })
     }
