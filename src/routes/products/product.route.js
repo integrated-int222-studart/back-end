@@ -10,6 +10,7 @@ const Approval = require('../../models/ManyToMany/approval.model')
 const express = require('express')
 const router = new express.Router()
 const { authUser } = require('../../middleware/auth.middleware')
+const Sequelize = require('sequelize')
 
 
 router.post('/addProduct', authUser, async (req, res) => {
@@ -32,7 +33,7 @@ router.post('/addProduct', authUser, async (req, res) => {
             status: 0
         })
         const styles = req.body.styleID
-            styles.forEach(async (styleID) => {
+        styles.forEach(async (styleID) => {
             await productStyle.create({
                 prodID: product.prodID,
                 styleID: styleID
@@ -44,8 +45,8 @@ router.post('/addProduct', authUser, async (req, res) => {
             prodID: product.prodID,
             status: 0
         })
-            // console.log(appoveAdmin)
-         res.status(201).send(product)
+        // console.log(appoveAdmin)
+        res.status(201).send(product)
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
@@ -55,24 +56,24 @@ router.delete('/deleteProduct/:id', authUser, async (req, res) => {
     try {
         const id = req.params.id
         const hasProduct = await Product.hasProduct(id)
-        
+
         if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
 
-      const collection =  await Collection.findOne({ where: { prodID: id } })
-        if(collection){
-            await Product.update({status:0},{
-                where:{
+        const collection = await Collection.findOne({ where: { prodID: id } })
+        if (collection) {
+            await Product.update({ status: 0 }, {
+                where: {
                     prodID: id
                 }
             })
-        }else{
+        } else {
             await Approval.destroy({ where: { prodID: id } })
             await Favorite.destroy({ where: { prodID: id } })
             await Images.destroy({ where: { prodID: id } })
             await productStyle.destroy({ where: { prodID: id } })
             await Product.destroy({ where: { prodID: id } })
         }
-       
+
         res.status(200).send({ message: 'Product has been removed' })
     } catch (error) {
         res.status(500).send({ error: error.massage })
@@ -232,6 +233,17 @@ router.get('/page', async (req, res) => {
 
 })
 
+router.get('/random', async (req, res) => {
+    try {
+        const randomProd = await Product.findAll({
+            order: Sequelize.literal('rand()'), limit: 6
+        })
+        if (!randomProd) return res.send({ meesage: 'No product' })
+        res.status(200).send(randomProd)
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
+})
 
 
 
