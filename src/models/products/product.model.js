@@ -104,7 +104,7 @@ Product.belongsToMany(Style, {
 //M:N ProductAppoval
 Admin.belongsToMany(Product, {
     through: Appoval,
-    as: 'prodAppoval',
+    as: 'prodApproval',
     timestamps: false,
     foreignKey: 'adminID'
 })

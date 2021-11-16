@@ -44,29 +44,41 @@ router.put('/approveProduct/:prodId', authAdmin, async (req, res) => {
                 prodID
             }
         })
+        
         if(req.body.status == 1){
             await Product.update({status:1},{
                 where:{
                     prodID
                 }
             })
-            return res.status(201).send({message:'Admin update approved: status 1'})
         }else if(req.body.status == 2){
             await Product.update({status:0},{
                 where:{
                     prodID
                 }
             })
-            return res.status(201).send({message:'Admin update disapproved: status 2'})
-            
         }else{
             await Product.update({status:0},{
                 where:{
                     prodID
                 }
             })
-            return res.status(201).send({message:'Admin not update yet: status 0'})
         }
+        const productWithApprove = await Product.findOne({
+            where:{
+                prodID
+            },
+            include: [{
+                model: Admin,
+                as: 'adminApproval',
+                attributes: { exclude: ['password'] },
+            }, {
+                model: Image,
+                attributes: { exclude: ['data'] },
+
+            }],
+        })
+        return res.status(201).send(productWithApprove)
     } catch (error) {
         res.status(500).send({ error: error.message })
     }
