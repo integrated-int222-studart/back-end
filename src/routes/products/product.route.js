@@ -94,7 +94,7 @@ router.put('/edit/:id', authUser, async (req, res) => {
 })
 
 router.get('/productById/:id', async (req, res) => {
-    // try {
+    try {
     const id = req.params.id
     const hasProduct = await Product.hasProduct(id)
     if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
@@ -121,9 +121,9 @@ router.get('/productById/:id', async (req, res) => {
     })
 
     res.status(200).send(productById)
-    // } catch (error) {
-    //     res.status(500).send({ error: error.massage })
-    // }
+    } catch (error) {
+        res.status(500).send({ error: error.massage })
+    }
 })
 router.get('/allProduct', async (req, res) => {
     try {
@@ -200,10 +200,6 @@ router.get('/products/:userId', async (req, res) => {
                 attributes: { exclude: ['password'] },
             }],
         })
-
-        // const favoriteProd = await Favorite.findAll({ where:{ userID: id }})
-
-        // const collectionProd = await Collection.findAll({ where:{userID: id }})
 
         if (!products) {
             throw new Error()

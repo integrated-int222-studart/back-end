@@ -4,6 +4,7 @@ const Style = require('../../models/products/style.model')
 const productStyle = require('../../models/ManyToMany/productStyles.model')
 const Product = require('../../models/products/product.model')
 const productType = require('../../models/products/productType.model')
+const Images = require('../../models/products/images.model')
 router.get('/allStyle', async (req, res) => {
     try {
         const style = await Style.findAll()
@@ -39,6 +40,10 @@ router.put('/editStyle/:prodId', async (req, res) => {
                 attributes: { exclude: ['productStyles'] }
             },{
                 model: productType,
+            },{
+                model: Images,
+                attributes: { exclude: ['data'] },
+
             }]
         })
         res.status(201).send(productWithStyle)
