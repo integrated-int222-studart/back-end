@@ -3,6 +3,7 @@ const router = new express.Router()
 const Style = require('../../models/products/style.model')
 const productStyle = require('../../models/ManyToMany/productStyles.model')
 const Product = require('../../models/products/product.model')
+const productType = require('../../models/products/productType.model')
 router.get('/allStyle', async (req, res) => {
     try {
         const style = await Style.findAll()
@@ -36,7 +37,9 @@ router.put('/editStyle/:prodId', async (req, res) => {
                 model: Style,
                 as: 'style',
                 attributes: { exclude: ['productStyles'] }
-            },]
+            },{
+                model: productType,
+            }]
         })
         res.status(201).send(productWithStyle)
     } catch (error) {
