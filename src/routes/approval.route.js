@@ -5,6 +5,7 @@ const Approval = require('../models/ManyToMany/approval.model')
 const Product = require('../models/products/product.model')
 const Admin = require('../models/admin/Admin.model')
 const Image = require('../models/products/images.model')
+const productType = require('../models/products/productType.model')
 router.get('/getApproval', authAdmin ,async (req, res) => {
     try {
         const productWithApprove = await Product.findAll({
@@ -76,7 +77,10 @@ router.put('/approveProduct/:prodId', authAdmin, async (req, res) => {
                 model: Image,
                 attributes: { exclude: ['data'] },
 
-            }],
+            },
+        {
+            model: productType,
+        }],
         })
         return res.status(201).send(productWithApprove)
     } catch (error) {
