@@ -57,7 +57,7 @@ router.delete('/deleteProduct/:id', authUser, async (req, res) => {
         if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
 
         const collection = await Collection.findOne({ where: { prodID: id } })
-        
+
         if (collection) {
             await Product.update({ status: 2 }, {
                 where: {
@@ -96,32 +96,32 @@ router.put('/edit/:id', authUser, async (req, res) => {
 
 router.get('/productById/:id', async (req, res) => {
     try {
-    const id = req.params.id
-    const hasProduct = await Product.hasProduct(id)
-    if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
-    const productById = await Product.findOne({
-        where: {
-            prodID: id
-        },
-        include: [
-            {
-                model: productType,
-            }, {
-                model: Style,
-                as: 'style',
-                attributes: { exclude: ['productStyles'] }
+        const id = req.params.id
+        const hasProduct = await Product.hasProduct(id)
+        if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
+        const productById = await Product.findOne({
+            where: {
+                prodID: id
             },
-            {
-                model: Images,
-                attributes: { exclude: ['data'] }
-            }, {
-                model: Admin,
-                as: 'adminApproval',
-                attributes: { exclude: ['password'] },
-            }]
-    })
+            include: [
+                {
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style',
+                    attributes: { exclude: ['productStyles'] }
+                },
+                {
+                    model: Images,
+                    attributes: { exclude: ['data'] }
+                }, {
+                    model: Admin,
+                    as: 'adminApproval',
+                    attributes: { exclude: ['password'] },
+                }]
+        })
 
-    res.status(200).send(productById)
+        res.status(200).send(productById)
     } catch (error) {
         res.status(500).send({ error: error.massage })
     }
@@ -228,9 +228,28 @@ router.get('/page', async (req, res) => {
 router.get('/random', async (req, res) => {
     try {
         const randomProd = await Product.findAll({
-            order: Sequelize.literal('rand()'), limit: 6
+            where: {
+                status: 1
+            },
+            order: Sequelize.literal('rand()'), limit: 6, 
+            include: [{
+                model: Admin,
+                as: 'adminApproval',
+                attributes: { exclude: ['password'] },
+            }, {
+                model: Images,
+                attributes: { exclude: ['data'] },
+
+            },
+            {
+                model: Style,
+                as: 'style'
+            },
+            {
+                model: productType,
+            }],
         })
-        if (!randomProd) return res.send({ meesage: 'No product' })
+        if (randomProd.length === 0) return res.send({ meesage: 'No product' })
         res.status(200).send(randomProd)
     } catch (error) {
         res.status(500).send({ error: error.massage })
