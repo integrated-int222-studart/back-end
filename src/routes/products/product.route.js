@@ -57,8 +57,9 @@ router.delete('/deleteProduct/:id', authUser, async (req, res) => {
         if (!hasProduct) return res.status(400).send({ message: 'No product with that id!' })
 
         const collection = await Collection.findOne({ where: { prodID: id } })
+        
         if (collection) {
-            await Product.update({ status: 0 }, {
+            await Product.update({ status: 2 }, {
                 where: {
                     prodID: id
                 }
