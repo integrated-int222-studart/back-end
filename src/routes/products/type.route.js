@@ -10,12 +10,12 @@ router.post('/addType', async(req, res) => {
         return allowedKey.includes(checkKeyBody)
     })
     if (!isValidKey) {
-        return res.status(404).send('Invalid key!')
+        return res.status(400).send('Invalid key!')
     }
     const checkTypeName = await productType.findOne({ where: { typeName: req.body.typeName } })
     try {
         if (checkTypeName) {
-            res.status(404).send('This type has been used')
+            res.status(400).send('This type has been used')
         }
         await productType.create(req.body)
         res.send('Type Created!')

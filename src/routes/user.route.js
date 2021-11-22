@@ -70,7 +70,7 @@ router.get('/getAll', async (req, res) => {
         }
         res.status(200).send(users)
     } catch (error) {
-        res.status(404).send({ error: error.massage })
+        res.status(500).send({ error: error.massage })
     }
 })
 //be test
@@ -172,7 +172,7 @@ router.get('/profile/:username', async (req, res) => {
         }
         res.status(200).send(profile)
     } catch (error) {
-        res.status(404).send({ error: error.massage })
+        res.status(500).send({ error: error.massage })
     }
 })
 router.get('/profile', authUser, (req, res) => {
@@ -238,7 +238,7 @@ router.get('/username/:userId', async(req,res)=>{
             },
             attributes: {exclude:["userID","password","email","firstName","lastName","description","status","school","imageData","imageName","imageType","imageURL"]}
         })
-        if(!username) return res.send({message:'No username with that id'})
+        if(!username) return res.status(400).send({message:'No username with that id'})
         res.status(200).send(username)
     } catch (error) {
         res.status(500).send({ error: error.massage })
