@@ -36,6 +36,12 @@ router.get('/collection/:userId', async (req, res) => {
                 include: [{
                     model: Image,
                     attributes: { exclude: ['data'] }
+                },{
+                    model: productType,
+                }, {
+                    model: Style,
+                    as: 'style'
+                    // attributes: { exclude: ['productstyles'] },
                 }]
             }]
         })
