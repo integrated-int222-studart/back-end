@@ -45,7 +45,7 @@ router.get('/get/:imageId', async (req, res) => {
             res.set('Content-Type', image.type)
             res.send(image.data)
         } else {
-            res.send({ message: 'No image with that id!' })
+            res.status(400).send({ message: 'No image with that id!' })
         }
     } catch (error) {
         res.status(500).send({ error: error.message })
