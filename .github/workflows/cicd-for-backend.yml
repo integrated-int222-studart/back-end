@@ -6,10 +6,10 @@ name: CICD
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [dev]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
@@ -24,4 +24,22 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/integrated-int222-studart/back-end:master
+          tags: ghcr.io/integrated-int222-studart/back-end:dev
+  deploy:
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Deploy API Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOSTNAME }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            touch .env
+            echo CONECTION=${{ secrets.DB_CONECTION }} > .env
+            echo JWT_SECRET=${{ secrets.JWT_SECRET }} > .env
+            echo ALLOWED_CORS=${{ secrets.ALLOWED_CORS }} > .env
+            echo IP_API=${{ secrets.IP_API }} > .env
+            docker-compose -f docker-compose.yml pull
+            docker-compose -f docker-compose.yml up --build -d
