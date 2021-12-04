@@ -31,7 +31,7 @@ jobs:
           host: ${{ secrets.SSH_HOSTNAME }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
-          source: "./docker-compose.yml"
+          source: "./docker-compose.be.yml"
           target: "."
 
   deploy:
@@ -45,11 +45,10 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            # git clone https://github.com/integrated-int222-studart/back-end.git
             touch .env
             echo CONECTION=${{ secrets.DB_CONECTION }} >> .env
             echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
             echo ALLOWED_CORS=${{ secrets.ALLOWED_CORS }} >> .env
             echo IP_API=${{ secrets.IP_API }} >> .env
-            docker-compose -f docker-compose.yml pull
-            docker-compose -f docker-compose.yml up --build -d
+            docker-compose -f docker-compose.be.yml pull
+            docker-compose -f docker-compose.be.yml up --build -d
