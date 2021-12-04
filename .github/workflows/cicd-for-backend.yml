@@ -25,6 +25,15 @@ jobs:
         with:
           push: true
           tags: ghcr.io/integrated-int222-studart/back-end:dev
+      - name: Publish compose file
+        uses: appleboy.scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOSTNAME }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "./docker-compose.yml"
+          target: "."
+
   deploy:
     needs: build
     runs-on: ubuntu-20.04
@@ -37,10 +46,10 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             # git clone https://github.com/integrated-int222-studart/back-end.git
-            # touch .env
-            # echo CONECTION=${{ secrets.DB_CONECTION }} > .env
-            # echo JWT_SECRET=${{ secrets.JWT_SECRET }} > .env
-            # echo ALLOWED_CORS=${{ secrets.ALLOWED_CORS }} > .env
-            # echo IP_API=${{ secrets.IP_API }} > .env
+            touch .env
+            echo CONECTION=${{ secrets.DB_CONECTION }} > .env
+            echo JWT_SECRET=${{ secrets.JWT_SECRET }} > .env
+            echo ALLOWED_CORS=${{ secrets.ALLOWED_CORS }} > .env
+            echo IP_API=${{ secrets.IP_API }} > .env
             docker-compose -f docker-compose.yml pull
             docker-compose -f docker-compose.yml up --build -d
