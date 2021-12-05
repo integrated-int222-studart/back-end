@@ -46,10 +46,10 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             touch back-compose/.env
+            cd back-compose/
             echo CONECTION=${{ secrets.DB_CONECTION }} >> .env
             echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
             echo ALLOWED_CORS=${{ secrets.ALLOWED_CORS }} >> .env
             echo IP_API=${{ secrets.IP_API }} >> .env
-            cd back-compose/
             docker-compose -f docker-compose.be.yml pull
             docker-compose -f docker-compose.be.yml up --build -d
