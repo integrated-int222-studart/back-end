@@ -1,15 +1,12 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CICD
-
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
@@ -25,3 +22,31 @@ jobs:
         with:
           push: true
           tags: ghcr.io/integrated-int222-studart/back-end:master
+      - name: Publish compose file
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOSTNAME }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          source: "./docker-compose.be.yml"
+          target: "./back-compose"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Deploy API Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOSTNAME }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            touch back-compose/.env
+            cd back-compose/
+            echo CONECTION=${{ secrets.DB_CONECTION }} >> .env
+            echo JWT_SECRET=${{ secrets.JWT_SECRET }} >> .env
+            echo ALLOWED_CORS=${{ secrets.ALLOWED_CORS }} >> .env
+            echo IP_API=${{ secrets.IP_API }} >> .env
+            docker-compose -f docker-compose.be.yml pull
+            docker-compose -f docker-compose.be.yml up --build -d
