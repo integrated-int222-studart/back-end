@@ -54,7 +54,6 @@ router.get('/get/:imageId', async (req, res) => {
 
 router.get('/download/:prodId', authUser, async (req, res) => {
     try {
-        const userID = req.user.userID
         const prodID = req.params.prodId
         const product = await Product.findOne({
             where: {
@@ -65,12 +64,6 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                 attributes: { exclude: ['data'] }
             }]
         })
-        const checkCollection = await Collection.findAll({
-            where:{
-                userID
-            }
-        })
-        for (let i = 0; i < checkCollection.length; i++) {
             if(checkCollection[i].prodID === prodID){
                 let arrImage = []
                 product.images.forEach(element => {
@@ -88,8 +81,6 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                  return res.download(outputPath)
             } 
            
-        }
-        return res.send({message:"Add to collection first"})
 
     } catch (error) {
         res.status(500).send({ error: error.message })
