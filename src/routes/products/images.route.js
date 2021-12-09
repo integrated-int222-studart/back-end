@@ -54,6 +54,7 @@ router.get('/get/:imageId', async (req, res) => {
 
 router.get('/download/:prodId', authUser, async (req, res) => {
     try {
+        const userID = req.user.userID
         const prodID = req.params.prodId
         const product = await Product.findOne({
             where: {
@@ -64,20 +65,31 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                 attributes: { exclude: ['data'] }
             }]
         })
-        let arrImage = []
-        product.images.forEach(element => {
-            arrImage.push(element.name)
-        });
-        const zip = new AdmZip()
-        if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
-        if (arrImage) {
-            for (i = 0; i < arrImage.length; i++) {
-                zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
+        const checkCollection = await Collection.findAll({
+            where:{
+                userID
             }
+        })
+        for (let i = 0; i < checkCollection.length; i++) {
+            if(checkCollection[i].prodID === prodID){
+                let arrImage = []
+                product.images.forEach(element => {
+                    arrImage.push(element.name)
+                });
+                const zip = new AdmZip()
+                if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
+                if (arrImage) {
+                    for (i = 0; i < arrImage.length; i++) {
+                        zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
+                    }
+                }
+                const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
+                fs.writeFileSync(outputPath, zip.toBuffer())
+                 return res.download(outputPath)
+            } 
+           
         }
-        const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
-        fs.writeFileSync(outputPath, zip.toBuffer())
-        res.download(outputPath)
+        return res.send({message:"Add to collection first"})
 
     } catch (error) {
         res.status(500).send({ error: error.message })
