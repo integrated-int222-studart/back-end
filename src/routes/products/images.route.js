@@ -64,23 +64,21 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                 attributes: { exclude: ['data'] }
             }]
         })
-            if(checkCollection[i].prodID === prodID){
-                let arrImage = []
-                product.images.forEach(element => {
-                    arrImage.push(element.name)
-                });
-                const zip = new AdmZip()
-                if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
-                if (arrImage) {
-                    for (i = 0; i < arrImage.length; i++) {
-                        zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
-                    }
-                }
-                const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
-                fs.writeFileSync(outputPath, zip.toBuffer())
-                 return res.download(outputPath)
-            } 
-           
+        let arrImage = []
+        product.images.forEach(element => {
+            arrImage.push(element.name)
+        });
+        const zip = new AdmZip()
+        if (arrImage.length === 0) return res.send({ message: 'No image for download with that id' })
+        if (arrImage) {
+            for (i = 0; i < arrImage.length; i++) {
+                zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
+            }
+        }
+        const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
+        fs.writeFileSync(outputPath, zip.toBuffer())
+        return res.download(outputPath)
+
 
     } catch (error) {
         res.status(500).send({ error: error.message })
