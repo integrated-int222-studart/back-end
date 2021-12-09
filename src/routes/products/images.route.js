@@ -2,6 +2,7 @@ const Images = require('../../models/products/images.model')
 const express = require('express')
 const router = new express.Router()
 const Product = require('../../models/products/product.model')
+const Collection = require('../../models/ManyToMany/collections.model')
 const User = require('../../models/user/User.model')
 const { uploadFileProd } = require('../../middleware/upload.middleware')
 var AdmZip = require("adm-zip");
@@ -54,7 +55,8 @@ router.get('/get/:imageId', async (req, res) => {
 
 router.get('/download/:prodId', authUser, async (req, res) => {
     try {
-        const prodID = req.params.prodId
+        const userID = req.user.userID
+        const prodID = parseInt(req.params.prodId) 
         const product = await Product.findOne({
             where: {
                 prodID
@@ -64,21 +66,32 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                 attributes: { exclude: ['data'] }
             }]
         })
-        let arrImage = []
-        product.images.forEach(element => {
-            arrImage.push(element.name)
-        });
-        const zip = new AdmZip()
-        if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
-        if (arrImage) {
-            for (i = 0; i < arrImage.length; i++) {
-                zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
+        const checkCollection = await Collection.findAll({
+            where:{
+                userID
             }
+        })
+        for (let i = 0; i < checkCollection.length; i++) {
+            if(checkCollection[i].prodID === prodID){
+                console.log("pass")
+                let arrImage = []
+                product.images.forEach(element => {
+                    arrImage.push(element.name)
+                });
+                const zip = new AdmZip()
+                if(arrImage.length === 0) return res.send({message:'No image for download with that id'})
+                if (arrImage) {
+                    for (i = 0; i < arrImage.length; i++) {
+                        zip.addLocalFile('./src/assets/uploads/product/' + arrImage[i])
+                    }
+                }
+                const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
+                fs.writeFileSync(outputPath, zip.toBuffer())
+                 return res.download(outputPath)
+            } 
+           
         }
-        const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
-        fs.writeFileSync(outputPath, zip.toBuffer())
-        res.download(outputPath)
-
+        return res.send({message:"Add to collection first"})
     } catch (error) {
         res.status(500).send({ error: error.message })
     }
