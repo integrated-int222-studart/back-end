@@ -55,7 +55,6 @@ router.get('/get/:imageId', async (req, res) => {
 
 router.get('/download/:prodId', authUser, async (req, res) => {
     try {
-        const userID = req.user.userID
         const prodID = parseInt(req.params.prodId) 
         const product = await Product.findOne({
             where: {
@@ -65,14 +64,7 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                 model: Images,
                 attributes: { exclude: ['data'] }
             }]
-        })
-        const checkCollection = await Collection.findAll({
-            where:{
-                userID
-            }
-        })
-        for (let i = 0; i < checkCollection.length; i++) {
-            if(checkCollection[i].prodID === prodID){
+        })        
                 console.log("pass")
                 let arrImage = []
                 product.images.forEach(element => {
@@ -88,10 +80,7 @@ router.get('/download/:prodId', authUser, async (req, res) => {
                 const outputPath = process.cwd() + "/src/assets/downloads/" + Date.now() + 'studart.zip'
                 fs.writeFileSync(outputPath, zip.toBuffer())
                  return res.download(outputPath)
-            } 
-           
-        }
-        return res.send({message:"Add to collection first"})
+            
     } catch (error) {
         res.status(500).send({ error: error.message })
     }
